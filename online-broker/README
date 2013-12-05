@@ -1,4 +1,9 @@
-This is your new Play application
+Online broker
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+Game where the user can buy and sell currencies to make money.
+
+Dependencies
+=====================================
+- Play 2.2.1
+- Slick
