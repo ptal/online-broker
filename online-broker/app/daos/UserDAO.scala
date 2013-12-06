@@ -6,7 +6,8 @@ import java.sql.{Time, Date}
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import models.{User, Currency, Account}
+import models.{UserAggregatedView, User, Currency, Account}
+import play.api.Logger
 
 object UserTable extends Table[(Long, String)]("Users") {
 
@@ -33,19 +34,25 @@ object UserTable extends Table[(Long, String)]("Users") {
 object UserDAO {
 
   def findById(id: Long): Option[User] = {
-    Database.forURL("jdbc:h2:file:test1", driver = "org.h2.Driver") withSession { implicit session =>
-
+    DBAccess.db withSession { implicit session =>
       Query(UserTable).filter(_.id === id).firstOption.map(x => User(x._1, x._2))
     }
   }
 
   def getAccounts(userId: Long): Set[Account] = {
-    Database.forURL("jdbc:h2:file:test1", driver = "org.h2.Driver") withSession { implicit session =>
+    DBAccess.db withSession { implicit session =>
       Query(AccountTable).filter(_.owner === userId).list().map{
         case (id, currencyString, amount, owner) =>
-          Account(id, Currency.currencyForName(currencyString), amount, owner)
-      }.toSet
+          Some(Account(id, Currency.currencyForName(currencyString).get, amount, owner))
+        case (id, currencyString, amount, owner) if !Currency.currencyForName(currencyString).isDefined =>
+          Logger.error(s"The currency $currencyString, stored in the db doesn't exists")
+          None
+      }.flatten.toSet
     }
+  }
+
+  def findByIdWithAggView(userId: Long): Option[UserAggregatedView] = {
+    findById(userId).map{ (user: User) => UserAggregatedView.create(user, getAccounts(userId)) }
   }
 
 

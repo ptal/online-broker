@@ -8,7 +8,7 @@ import scala.slick.driver.H2Driver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import daos.{AccountTable, UserTable}
+import daos.{AccountTable, UserTable, DBAccess}
 import models.Dollar
 
 object Global extends GlobalSettings {
@@ -18,8 +18,7 @@ object Global extends GlobalSettings {
     val INITIAL_MONEY = 300000
 
     // Fills the database (for testing purposes)
-    Database.forURL("jdbc:h2:file:test1", driver = "org.h2.Driver") withSession {
-      println("Inserting")
+    /*DBAccess.db withSession {
       (UserTable.ddl ++ AccountTable.ddl).create
 
       val users = List("Pierre Talbot", "Inigo Mediavilla")
@@ -28,7 +27,7 @@ object Global extends GlobalSettings {
 
       // Insert some suppliers
       idsUsers.foreach(AccountTable.add(Dollar.name, INITIAL_MONEY, _))
-    }
+    }*/
   }
 
 }
