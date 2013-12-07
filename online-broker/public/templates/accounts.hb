@@ -1,4 +1,4 @@
-<h2>Your Accounts (<b>{{name}}</b>)</h2>
+
 <table class="pure-table">
     <thead>
 
