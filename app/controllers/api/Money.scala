@@ -11,21 +11,24 @@ import daos.AccountDAO
 object Money extends Controller {
 
   def transfer = Action(parse.json) { request =>
-    (request.body \ "user-id").asOpt[Long].map { owner => 
-      AccountDAO.findByOwner(owner) match {
-        case Some(_) => (request.body \ "transfer-to").asOpt[String].map { cur =>
-          Ok(Json.toJson(
-            Map("status" -> "OK", "money" -> "test", "currency" -> cur)
-          ))
-        }.getOrElse {
-          BadRequest(Json.toJson(
-            Map("status" -> "KO", "error" -> "no transfer-to field found.")))
+    implicit val transferReads = (
+      (__ \ "user-id").read[Long] and
+      (__ \ "transfer-to").read[String]
+      tupled
+    )
+    request.body.validate[(Long,String)].fold(
+      valid = { case (userID, transferTo) => 
+        AccountDAO.findByOwner(userID) match {
+          case Some(_) => Ok(Json.toJson(
+            Map("status" -> "OK", "money" -> "test", "currency" -> "cur")))
+          case None => BadRequest(Json.toJson(
+            Map("status" -> "KO", "error" -> "Bad user id.")))
         }
-        case None => NotFound("The user does not exist")
+      },
+      invalid = { _ =>
+        BadRequest(Json.toJson(
+          Map("status" -> "KO", "error" -> "The request is invalid.")))
       }
-    }.getOrElse {
-      BadRequest(Json.toJson(
-        Map("status" -> "KO", "error" -> "no user-id field found.")))
-    }
+    )
   }
 }
