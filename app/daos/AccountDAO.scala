@@ -3,6 +3,7 @@ package daos
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
+import models.{Account, Currency, Dollar}
 
 object AccountTable extends Table[(Long, String, Long, Long)]("Accounts") {
 
@@ -21,8 +22,18 @@ object AccountTable extends Table[(Long, String, Long, Long)]("Accounts") {
 
 }
 
-class AccountDAO {
+object AccountDAO {
 
-
-
+  def findByOwner(owner: Long): Option[Account] = {
+    DBAccess.db withSession { implicit session =>
+      Query(AccountTable).filter(_.owner === owner)
+      .firstOption.map { x =>
+        Currency.currencyForName(x._2).map { cur =>
+          Account(x._1, cur, x._3, x._4)
+        }.getOrElse {
+          Account(x._1, Dollar, x._3, x._4)
+        }
+      }
+    }
+  }
 }
