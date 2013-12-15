@@ -21,8 +21,10 @@ object Money extends Controller {
   }
 
   def transfer = Action(parse.json) { request =>
-
+    print ("In transfer\n")
     // Default to dollar
+    // TODO: It should exist a way to replace Dollar by ValidationError("unknown currency")
+    //       and avoid the use of validCurrency...
     def convertToCurrency(implicit s: Reads[String]): Reads[Currency] = 
       s.map[Currency](
         Currency.currencyForName(_) match {
