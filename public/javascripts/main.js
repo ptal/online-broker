@@ -6,7 +6,7 @@ var app = $.sammy("#main", function() {
    this.get('#/user/:id/accounts/', function(context) {
    // fetch handlebars-partial first
 
-     this.load("/rest/user/" + context.params.id, function(userInfo){
+     this.load("/api/user/" + context.params.id, function(userInfo){
        this.render("/assets/templates/accounts.hb", JSON.parse(userInfo)).swap();
      });
 
