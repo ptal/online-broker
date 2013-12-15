@@ -4,7 +4,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import models.{UserAggregatedView, User, Account, Currency}
+import models.{UserAggregatedView, Account, Currency, User}
 import daos.UserDAO
 
 
@@ -22,7 +22,5 @@ object UserController extends Controller {
       case Some(user) => Ok(Json.toJson(user))
       case None => NotFound("The user does not exist")
     }
-
   }
-
 }

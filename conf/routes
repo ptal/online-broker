@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET   /rest/user/:id      controllers.api.UserController.index(id:Long)
+GET   /api/user/:id       controllers.api.UserController.index(id:Long)
 GET   /user/accounts/:id  controllers.html.MainController.userAccounts(id:Long)
 POST  /api/transfer       controllers.api.Money.transfer()
 

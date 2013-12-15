@@ -18,16 +18,16 @@ object Global extends GlobalSettings {
     val INITIAL_MONEY = 300000
 
     // Fills the database (for testing purposes)
-    /*DBAccess.db withSession {
-      (UserTable.ddl ++ AccountTable.ddl).create
+    // DBAccess.db withSession {
+    //   (UserTable.ddl ++ AccountTable.ddl).create
 
-      val users = List("Pierre Talbot", "Inigo Mediavilla")
+    //   val users = List("Pierre Talbot", "Inigo Mediavilla")
 
-      val idsUsers = users.map(UserTable.add(_))
+    //   val idsUsers = users.map(UserTable.add(_))
 
-      // Insert some suppliers
-      idsUsers.foreach(AccountTable.add(Dollar.name, INITIAL_MONEY, _))
-    }*/
+    //   // Insert some suppliers
+    //   idsUsers.foreach(AccountTable.add(Dollar.name, INITIAL_MONEY, _))
+    // }
   }
 
 }
