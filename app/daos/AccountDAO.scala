@@ -5,7 +5,7 @@ import scala.slick.driver.H2Driver.simple._
 
 import models.{Account, Currency, Dollar}
 
-object AccountTable extends Table[(Long, String, Double, Long)]("Accounts") {
+object Transfer extends Table[(Long, String, Double, Long)]("Accounts") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def currency = column[String]("currency")
@@ -24,30 +24,23 @@ object AccountTable extends Table[(Long, String, Double, Long)]("Accounts") {
 
 object AccountDAO {
 
-  def updateCurrency(id: Long, currency: String): Int = {
-    DBAccess.db withSession { implicit session =>
-      val q = for { a <- AccountTable if a.id === id } yield a.currency
-      q.update(currency)
+  def transfer(fromCurrency: Currency, toCurrency: Currency, amount: Double, owner: Long) : models.Transfer = {
+    DBAccess.db withSession { implicit session : Session =>
+      Transfer.add(fromCurrency.name, - amount, owner)
+      Transfer.add(toCurrency.name, amount, owner)
     }
-  }  
-
-  def updateAmount(id: Long, amount: Double): Int = {
-    DBAccess.db withSession { implicit session =>
-      val q = for { a <- AccountTable if a.id === id } yield a.amount
-      q.update(amount)
-    }
+    models.Transfer(fromCurrency, toCurrency, amount, owner)
   }
 
-  def findByOwner(owner: Long): Option[Account] = {
+  def findByOwner(owner: Long): List[Account] = {
     DBAccess.db withSession { implicit session =>
-      Query(AccountTable).filter(_.owner === owner)
-      .firstOption.map { x =>
-        Currency.currencyForName(x._2).map { cur =>
-          Account(x._1, cur, x._3, x._4)
-        }.getOrElse {
-          Account(x._1, Dollar, x._3, x._4)
-        }
+      val sumQuery = Query(Transfer).filter(_.owner === owner).groupBy(_.currency) map { x =>
+        val (currency, operations) = x
+        (currency, operations.map(_.amount).sum.getOrElse(0.0))
       }
+      sumQuery.list.map{ case (currency, total) =>
+        Currency.currencyForName(currency) map { Account(_, total, owner) }
+      }.flatten
     }
   }
 }

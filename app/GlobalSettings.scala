@@ -8,7 +8,7 @@ import scala.slick.driver.H2Driver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import daos.{AccountTable, UserTable, DBAccess}
+import daos.{Transfer, UserTable, DBAccess}
 import models.Dollar
 
 object Global extends GlobalSettings {

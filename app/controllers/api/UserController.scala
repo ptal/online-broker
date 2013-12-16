@@ -11,9 +11,8 @@ import daos.UserDAO
 object UserController extends Controller {
 
   def index(id: Long) = Action {
-    implicit val writeCurrency = new Writes[Currency]{
-      def writes(a: Currency) : JsValue = JsString(a.name)
-    }
+
+    implicit val writeCurrency = Currency.writeCurrency
     implicit val writeAccount = Json.writes[Account]
     implicit val writeUser : Writes[User] = Json.writes[User]
     implicit val writeUserAgg : Writes[UserAggregatedView] = Json.writes[UserAggregatedView]

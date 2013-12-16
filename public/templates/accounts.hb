@@ -1,7 +1,5 @@
 
-<h2 class="content-subhead">Grid Helper Classes</h2>
-
-<p> Savings </p>
+<h2 class="content-subhead">Savings</h2>
 
 <table class="pure-table pure-table-bordered">
     <thead>
@@ -20,17 +18,35 @@
     {{/each}}
 </table>
 
-<form method="POST" action="#/transfer/">
-    <label for="currency"> Currency </label>
-    <select name="currency" id="currency-choice">
-      <option value="models.Dollar$">Dollar</option>
-      <option value="models.Euro$">Euro</option>
-      <option value="models.Pound$">Pound</option>
-    </select>
-    <!-- <label for="amount"> Amount </label>
-    <input type="text" name="amount"/> --!>
-    <input type="submit" value="Transfer"/>
-    <!-- <button type="button" onclick="transfer_currencies()">Transfer</button> --!>
+<form method="POST" action="#/transfer/" class="pure-form pure-form-aligned">
+<fieldset>
+    <legend>Transfer</legend>
+
+    <div class="pure-control-group">
+        <label for="currencyFrom"> From Currency </label>
+        <select name="currencyFrom" id="currency-from-choice">
+          <option value="models.Dollar$">Dollar</option>
+          <option value="models.Euro$">Euro</option>
+          <option value="models.Pound$">Pound</option>
+        </select>
+    </div>
+    <div class="pure-control-group">
+        <label for="currencyTo"> To Currency </label>
+        <select name="currencyTo" id="currency-to-choice">
+          <option value="models.Dollar$">Dollar</option>
+          <option value="models.Euro$">Euro</option>
+          <option value="models.Pound$">Pound</option>
+        </select>
+    </div>
+    <div class="pure-control-group">
+        <label for="amount"> Amount </label>
+        <input type="text" name="amount"/>
+    </div>
+    <div class="pure-controls">
+        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+    </div>
+
+</fieldset>
 </form>
 
 

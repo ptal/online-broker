@@ -39,20 +39,8 @@ object UserDAO {
     }
   }
 
-  def getAccounts(userId: Long): Set[Account] = {
-    DBAccess.db withSession { implicit session =>
-      Query(AccountTable).filter(_.owner === userId).list().map{
-        case (id, currencyString, amount, owner) =>
-          Some(Account(id, Currency.currencyForName(currencyString).get, amount, owner))
-        case (id, currencyString, amount, owner) if !Currency.currencyForName(currencyString).isDefined =>
-          Logger.error(s"The currency $currencyString, stored in the db doesn't exists")
-          None
-      }.flatten.toSet
-    }
-  }
-
   def findByIdWithAggView(userId: Long): Option[UserAggregatedView] = {
-    findById(userId).map{ (user: User) => UserAggregatedView.create(user, getAccounts(userId)) }
+    findById(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findByOwner(userId).toSet) }
   }
 
 

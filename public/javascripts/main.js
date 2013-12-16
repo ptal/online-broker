@@ -24,7 +24,12 @@ function transfer_currencies(context) {
   $.ajax({
           url: "/api/transfer",
           type: "post",
-          data: JSON.stringify({"user-id": parseInt(userId), "transfer-to": context.params.currency}),
+          data: JSON.stringify({
+            "userId": parseInt(userId),
+            "currencyFrom": context.params.currencyFrom,
+            "currencyTo": context.params.currencyTo,
+            "amount" : parseInt(context.params.amount),
+          }),
           dataType: "json",
           contentType: "application/json; charset=utf-8",
           success: function (data, text) {

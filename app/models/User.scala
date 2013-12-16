@@ -1,5 +1,7 @@
 package models
 
+import play.api.libs.json.{JsString, JsValue, Writes}
+
 sealed abstract class Currency {
   def name = this.getClass.getName
   def rate: Double
@@ -16,32 +18,28 @@ object Pound extends Currency {
 
 object Currency {
 
+  val writeCurrency = new Writes[Currency]{
+    def writes(a: Currency) : JsValue = JsString(a.name)
+  }
+
   val names = List(Dollar, Euro, Pound).map((x) => (x.name, x)).toMap
 
   def currencyForName(name: String) : Option[Currency] = names.get(name)
 
-  def rate(from: Currency, to:Currency, amount:Double): Double =
+  def convert(from: Currency, to:Currency, amount:Double): Double =
     amount / from.rate * to.rate
 }
 
 
 case class User(id: Long, name: String)
 
-case class Account(id: Long, currency: Currency, amount: Double, owner: Long)
+case class Account(currency: Currency, amount: Double, owner: Long)
+
+case class Transfer(currencyFrom: Currency, currencyTo: Currency, amount: Double, owner: Long)
 
 object Account {
 
-  def transferMoney(owner: Long, toCurrency: Currency): Option[Double] = {
-    daos.AccountDAO.findByOwner(owner) match {
-      case Some(account) => {
-        val ratedAmount = Currency.rate(account.currency, toCurrency, account.amount)
-        daos.AccountDAO.updateCurrency(owner, toCurrency.name)
-        daos.AccountDAO.updateAmount(owner, ratedAmount)
-        Some(ratedAmount)
-      }
-      case None => None // No user ID found.
-    }
-  }
+
 }
 
 case class UserAggregatedView(id: Long, name: String, accounts: Set[Account])
