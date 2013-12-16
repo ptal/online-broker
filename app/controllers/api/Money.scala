@@ -47,9 +47,9 @@ object Money extends Controller {
     )
     request.body.validate[(Long,Currency)].fold(
       valid = { x => do_transfer(x._1, x._2) },
-      invalid = { _ =>
+      invalid = { error =>
         BadRequest(Json.toJson(
-          Map("status" -> "KO", "error" -> "The request is invalid.")))
+          Map("status" -> "KO", "error" -> s"The request is invalid. Error: ${error.toString}")))
       }
     )
   }

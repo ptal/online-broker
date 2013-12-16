@@ -3,32 +3,36 @@ var app = $.sammy("#main", function() {
   this.use('Handlebars', 'hb');
   this.use(Sammy.JSON);
 
-  this.get('#/user/:id/accounts/', function(context) {
+  this.get('#/list/', function(context) {
     // fetch handlebars-partial first
 
-    this.load("/api/user/" + context.params.id, function(userInfo){
+    this.load("/api/user/" + userId, {"cache": false}, function(userInfo){
       this.render("/assets/templates/accounts.hb", JSON.parse(userInfo)).swap();
     });
   });
+
+  this.post('#/transfer/', function(context){
+    transfer_currencies(context);
+  })
 });
 
 $(function() {
   app.run()
 });
 
-function transfer_currencies() {
-  var cur = "models." + $("#currency-choice option:selected").text() + "$";
+function transfer_currencies(context) {
   $.ajax({
-    url: "localhost:9000/api/transfer",
-    type: "POST",
-    data: {"user-id": 1,
-           "transfer-to": cur},
-    datatype: "json",
-    success: function (data, text) {
-      alert(text);
-    },
-    error: function (request, status, error) {
-      alert(request.responseText);
-    }
-  })
+          url: "/api/transfer",
+          type: "post",
+          data: JSON.stringify({"user-id": parseInt(userId), "transfer-to": context.params.currency}),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          success: function (data, text) {
+            console.log(data);
+            context.redirect('#/list/');
+          },
+          error: function (request, status, error) {
+            console.log(request.responseText);
+          }
+      })
 }
