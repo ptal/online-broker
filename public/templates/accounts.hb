@@ -11,7 +11,7 @@
     {{#each accounts}}
     <tbody>
         <tr>
-            <td>{{currency}}</td>
+            <td>{{currency.name}}</td>
             <td>{{amount}}</td>
         </tr>
     </tbody>
@@ -25,17 +25,17 @@
     <div class="pure-control-group">
         <label for="currencyFrom"> From Currency </label>
         <select name="currencyFrom" id="currency-from-choice">
-          <option value="models.Dollar$">Dollar</option>
-          <option value="models.Euro$">Euro</option>
-          <option value="models.Pound$">Pound</option>
+          <option value="Dollar">Dollar</option>
+          <option value="Euro">Euro</option>
+          <option value="Pound">Pound</option>
         </select>
     </div>
     <div class="pure-control-group">
         <label for="currencyTo"> To Currency </label>
         <select name="currencyTo" id="currency-to-choice">
-          <option value="models.Dollar$">Dollar</option>
-          <option value="models.Euro$">Euro</option>
-          <option value="models.Pound$">Pound</option>
+          <option value="Dollar">Dollar</option>
+          <option value="Euro">Euro</option>
+          <option value="Pound">Pound</option>
         </select>
     </div>
     <div class="pure-control-group">

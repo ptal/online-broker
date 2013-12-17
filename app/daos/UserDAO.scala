@@ -40,7 +40,7 @@ object UserDAO {
   }
 
   def findByIdWithAggView(userId: Long): Option[UserAggregatedView] = {
-    findById(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findByOwner(userId).toSet) }
+    findById(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findAccountByOwner(userId).toSet) }
   }
 
 

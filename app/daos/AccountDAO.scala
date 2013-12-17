@@ -3,9 +3,9 @@ package daos
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import models.{Account, Currency, Dollar}
+import models.{Account, Currency}
 
-object Transfer extends Table[(Long, String, Double, Long)]("Accounts") {
+object Transfer extends Table[(Long, String, Double, Long)]("Transfers") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def currency = column[String]("currency")
@@ -27,19 +27,19 @@ object AccountDAO {
   def transfer(fromCurrency: Currency, toCurrency: Currency, amount: Double, owner: Long) : models.Transfer = {
     DBAccess.db withSession { implicit session : Session =>
       Transfer.add(fromCurrency.name, - amount, owner)
-      Transfer.add(toCurrency.name, amount, owner)
+      Transfer.add(toCurrency.name, (amount * fromCurrency.currentRateAgainstDollar) / toCurrency.currentRateAgainstDollar, owner)
     }
     models.Transfer(fromCurrency, toCurrency, amount, owner)
   }
 
-  def findByOwner(owner: Long): List[Account] = {
+  def findAccountByOwner(owner: Long): List[Account] = {
     DBAccess.db withSession { implicit session =>
       val sumQuery = Query(Transfer).filter(_.owner === owner).groupBy(_.currency) map { x =>
         val (currency, operations) = x
         (currency, operations.map(_.amount).sum.getOrElse(0.0))
       }
       sumQuery.list.map{ case (currency, total) =>
-        Currency.currencyForName(currency) map { Account(_, total, owner) }
+        CurrencyDAO.findCurrentExchangeRate(currency) map { Account(_, total, owner) }
       }.flatten
     }
   }

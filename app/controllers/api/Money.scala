@@ -5,8 +5,8 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
 
-import models.{Transfer, Currency, Dollar}
-import daos.{UserDAO, AccountDAO}
+import models.{Transfer, Currency}
+import daos.{CurrencyDAO, UserDAO, AccountDAO}
 
 
 object Money extends Controller {
@@ -19,34 +19,29 @@ object Money extends Controller {
   }
 
   def transfer = Action(parse.json) { request =>
-    print ("In transfer\n")
-    // Default to dollar
-    // TODO: It should exist a way to replace Dollar by ValidationError("unknown currency")
-    //       and avoid the use of validCurrency...
-    def convertToCurrency(implicit s: Reads[String]): Reads[Currency] = 
-      s.map[Currency](
-        Currency.currencyForName(_) match {
-          case Some(currency) => currency
-          case None => Dollar
-        }
-      )
-
-    def validCurrency(implicit s: Reads[String]): Reads[String] =
-      s.filter(ValidationError("unknown currency"))(
-        Currency.currencyForName(_) match {
-          case Some(currency) => true
-          case None => false
-      })
-
     implicit val transferReads = (
       (__ \ "userId").read[Long] and
       (__ \ "amount").read[Double] and
-      (__ \ "currencyFrom").read[Currency](validCurrency andKeep convertToCurrency) and
-      (__ \ "currencyTo").read[Currency](validCurrency andKeep convertToCurrency)
+      (__ \ "currencyFrom").read[String] and
+      (__ \ "currencyTo").read[String]
       tupled
     )
-    request.body.validate[(Long, Double, Currency, Currency)].fold(
-      valid = { x => Ok(doTransfer(x._1, x._3, x._4, x._2)) },
+    request.body.validate[(Long, Double, String, String)].fold(
+      valid = { x =>
+        val (userId, amount, fromCurrencyName, toCurrencyName) = x
+        val transfer = for {
+          fromCurrency <- daos.CurrencyDAO.findCurrentExchangeRate(fromCurrencyName)
+          toCurrency <- daos.CurrencyDAO.findCurrentExchangeRate(toCurrencyName)
+        } yield {Ok(doTransfer(userId, fromCurrency, toCurrency, amount))}
+        transfer.getOrElse(
+          BadRequest(
+            Json.obj(
+              "status" -> "KO",
+              "error" -> "Error when retrieving the exchange rate for a currency"
+            )
+          )
+        )
+      },
       invalid = { error =>
         BadRequest(Json.toJson(
           Map("status" -> "KO", "error" -> s"The request is invalid. Error: ${error.toString}")))
