@@ -3,9 +3,6 @@ import play.api._
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
@@ -38,9 +35,8 @@ object Global extends GlobalSettings {
     //    Query(Transfer).delete
     //    idsUsers.foreach(Transfer.add("Dollar", INITIAL_MONEY, _))
     // }
-    future {
-      ExchangeRatesUpdater.run
-    }
+    ExchangeRatesUpdater.init
+    ExchangeRatesUpdater.run
   }
 
 }

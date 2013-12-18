@@ -48,6 +48,15 @@ object CurrencyDAO {
 
   def updateRate(currencyAcronym: String, rate: Double) = {
     DBAccess.db withSession { implicit session : Session =>
+      val q = for { 
+        a <- ExchangeRates if a.currencyAcronym === currencyAcronym 
+      } yield a.exchangeRate
+      q.update(rate)
+    }
+  }
+
+  def addRate(currencyAcronym: String, rate: Double) = {
+    DBAccess.db withSession { implicit session : Session =>
       ExchangeRates.add(currencyAcronym, "", rate)
     }
   }
