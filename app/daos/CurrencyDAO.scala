@@ -46,6 +46,12 @@ object CurrencyDAO {
     }
   }
 
+  def updateRate(currencyAcronym: String, rate: Double) = {
+    DBAccess.db withSession { implicit session : Session =>
+      ExchangeRates.add(currencyAcronym, "", rate)
+    }
+  }
+
   def updateLastRateDate(lastExchangeRateUpdate: Date) =
     DBAccess.db withSession { implicit session : Session =>
       val q = for { a <- CurrencyStatus } yield a.lastExchangeRateUpdate
