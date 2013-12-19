@@ -19,6 +19,8 @@ object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRate
 
   def autoInc = currencyAcronym ~ currencyName ~ exchangeRate returning id
 
+  def uniqueAcronym = index("IDX_ACRONYM", currencyAcronym, unique = true)
+  
   def add(currencyAcronym: String, currencyName: String, exchangeRate: Double)(implicit s: Session) : Long =
     autoInc.insert(currencyAcronym, currencyName, exchangeRate)
 
@@ -55,9 +57,9 @@ object CurrencyDAO {
     }
   }
 
-  def addRate(currencyAcronym: String, rate: Double) = {
+  def addRate(currencyAcronym: String, currencyName: String, rate: Double) = {
     DBAccess.db withSession { implicit session : Session =>
-      ExchangeRates.add(currencyAcronym, "", rate)
+      ExchangeRates.add(currencyAcronym, currencyName, rate)
     }
   }
 
