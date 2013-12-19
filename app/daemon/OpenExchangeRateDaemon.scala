@@ -5,7 +5,6 @@ import play.api.libs.ws._
 import play.api.libs.json._
 
 import scala.concurrent._
-
 import scala.concurrent.ExecutionContext.Implicits.global 
 
 import scala.slick.session.Database
@@ -48,6 +47,7 @@ object ExchangeRatesUpdater {
   private def updateRates(rates: JsValue) = {
     retrieveRates(rates).foreach(rate =>
       CurrencyDAO.updateRate(rate._1, rate._2))
+    updateLastRateDate(rates)
   }
 
   private def initExchangeRates(rates: JsValue, names: JsValue) = {
@@ -58,11 +58,20 @@ object ExchangeRatesUpdater {
     }
   }
 
+  private def updateLastRateDate(rates: JsValue) = {
+    // The timestamp returned by OpenExchangeRates is in seconds.
+    val timestamp = (rates \ "timestamp").as[JsNumber].as[Long] * 1000
+    CurrencyDAO.updateLastRateDate(timestamp)
+  }
+
   def init() = {
     println("Init database.")
     makeJsonRequest(latestRateURL, jrates =>
-      makeJsonRequest(currenciesNamesURL, jnames =>
-        initExchangeRates(jrates, jnames)))
+      makeJsonRequest(currenciesNamesURL, jnames => {
+        initExchangeRates(jrates, jnames)
+        updateLastRateDate(jrates)
+      })
+    )
   }
 
   def start() = {

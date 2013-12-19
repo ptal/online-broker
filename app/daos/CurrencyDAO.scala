@@ -2,7 +2,6 @@ package daos
 
 import models.Currency
 
-import org.joda.time.DateTime
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 import java.sql.Date
@@ -35,7 +34,7 @@ object CurrencyStatus extends Table[(Long, Date)]("CurrencyStatus") {
   def autoInc = lastExchangeRateUpdate returning id
 
   def init(implicit s: Session): Long =
-    autoInc.insert(new java.sql.Date(DateTime.now().getMillis))
+    autoInc.insert(new Date(0))
 }
 
 object CurrencyDAO {
@@ -63,10 +62,10 @@ object CurrencyDAO {
     }
   }
 
-  def updateLastRateDate(lastExchangeRateUpdate: Date) =
+  def updateLastRateDate(timestamp: Long) =
     DBAccess.db withSession { implicit session : Session =>
       val q = for { a <- CurrencyStatus } yield a.lastExchangeRateUpdate
-      q.update(lastExchangeRateUpdate)
+      q.update(new Date(timestamp))
    }
 
 }
