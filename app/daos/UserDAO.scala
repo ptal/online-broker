@@ -6,7 +6,7 @@ import java.sql.{Time, Date}
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import models.{UserAggregatedView, User, Currency, Account}
+import models.{UserAggregatedView, User, Account}
 import play.api.Logger
 
 object UserTable extends Table[(Long, String)]("Users") {
@@ -27,7 +27,8 @@ object UserTable extends Table[(Long, String)]("Users") {
    * @param userName name of the user
    * @return the id of the new created user
    */
-  def add(userName: String)(implicit s: Session) : Long = autoInc.insert(userName)
+  def add(userName: String)(implicit s: Session) : Long = 
+    autoInc.insert(userName)
 
 }
 

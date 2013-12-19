@@ -1,7 +1,5 @@
 package daos
 
-import models.Currency
-
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 import java.sql.Date
@@ -21,7 +19,9 @@ object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRate
   def uniqueAcronym = index("IDX_ACRONYM", currencyAcronym, unique = true)
   
   def add(currencyAcronym: String, currencyName: String, exchangeRate: Double)(implicit s: Session) : Long =
+    {println("Add exchange rate.")
     autoInc.insert(currencyAcronym, currencyName, exchangeRate)
+  }
 
 }
 
@@ -39,10 +39,18 @@ object CurrencyStatus extends Table[(Long, Date)]("CurrencyStatus") {
 
 object CurrencyDAO {
 
-  def findCurrentExchangeRate(name: String): Option[Currency] = {
+  def acronymOfCurrency(id: Long): Option[String] = {
     DBAccess.db withSession { implicit session =>
-      Query(ExchangeRates).filter(_.currencyName === name).sortBy(_.currencyName).firstOption.map {
-        case (_, _, name, rate) => Currency(name, rate)
+      Query(ExchangeRates).filter(_.id === id).sortBy(_.currencyAcronym).firstOption.map {
+        case (_, acronym, _, _) => acronym
+      }
+    }
+  }
+
+  def getIDRate(currencyAcronym: String): Option[(Long,Double)] = {
+    DBAccess.db withSession { implicit session =>
+      Query(ExchangeRates).filter(_.currencyAcronym === currencyAcronym).firstOption.map {
+        case (id,_,_,rate) => (id, rate)
       }
     }
   }
@@ -57,6 +65,7 @@ object CurrencyDAO {
   }
 
   def addRate(currencyAcronym: String, currencyName: String, rate: Double) = {
+    println("Add exchange rates: " + currencyAcronym + "," + currencyName)
     DBAccess.db withSession { implicit session : Session =>
       ExchangeRates.add(currencyAcronym, currencyName, rate)
     }

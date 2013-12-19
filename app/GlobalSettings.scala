@@ -3,10 +3,12 @@ import play.api._
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
+import scala.concurrent.Lock
+
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import daos.{ExchangeRates, Transfer, UserTable, CurrencyStatus, DBAccess}
+import daos.{ExchangeRates, Transfer, UserTable, CurrencyStatus, CurrencyDAO, DBAccess}
 import daemon.ExchangeRatesUpdater
 
 object Global extends GlobalSettings {
@@ -16,27 +18,40 @@ object Global extends GlobalSettings {
 
     val INITIAL_MONEY = 300000
 
+    // Creation of the tables
+    DBAccess.db withSession {
+      (UserTable.ddl ++ Transfer.ddl ++ ExchangeRates.ddl ++ CurrencyStatus.ddl).create
+
+      Query(ExchangeRates).delete
+      Query(CurrencyStatus).delete
+      Query(UserTable).delete
+      Query(Transfer).delete
+
+      CurrencyStatus.init
+    }
+
+    val init_complete = ExchangeRatesUpdater.init
+    init_complete.acquire
+    init_complete.release
+
+    println("Initialization complete.")
 
     // Fills the database (for testing purposes)
-
     DBAccess.db withSession {
-    //    (UserTable.ddl ++ Transfer.ddl ++ ExchangeRates.ddl ++ CurrencyStatus.ddl).create
 
-       Query(ExchangeRates).delete
+      val users = List("Pierre Talbot", "Inigo Mediavilla")
+      val idUsers = users.map(UserTable.add(_))
+      val idUSD = CurrencyDAO.getIDRate("USD").map(_._1)
 
-    //    Query(CurrencyStatus).delete
-    //    CurrencyStatus.init
-
-    //    val users = List("Pierre Talbot", "Inigo Mediavilla")
-
-    //    Query(UserTable).delete
-    //    val idsUsers = users.map(UserTable.add(_))
-
-    //    // Insert some suppliers
-    //    Query(Transfer).delete
-    //    idsUsers.foreach(Transfer.add("Dollar", INITIAL_MONEY, _))
+      // Insert some suppliers
+      for(idUser <- idUsers;
+         idCur <- idUSD) {
+        println("Add this id: " + idCur)
+        Transfer.add(idCur, INITIAL_MONEY, idUser)
+      }
     }
-    ExchangeRatesUpdater.init
+    // Start the daemon that will periodically update the 
+    // currencies rates in the database.
     ExchangeRatesUpdater.start
   }
 

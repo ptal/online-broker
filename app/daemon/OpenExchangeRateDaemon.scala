@@ -5,7 +5,7 @@ import play.api.libs.ws._
 import play.api.libs.json._
 
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global 
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
@@ -51,9 +51,11 @@ object ExchangeRatesUpdater {
   }
 
   private def initExchangeRates(rates: JsValue, names: JsValue) = {
+    println("initExchangeRates")
     for(rate <- retrieveRates(rates);
         name <- retrieveNames(names)
-        if (rate._1 == name._2)) {
+        if (rate._1 == name._1)) {
+      println("In loop")
       CurrencyDAO.addRate(name._1, name._2, rate._2)
     }
   }
@@ -64,14 +66,18 @@ object ExchangeRatesUpdater {
     CurrencyDAO.updateLastRateDate(timestamp)
   }
 
-  def init() = {
+  def init(): Lock = {
+    var initialization_complete = new Lock
+    initialization_complete.acquire
     println("Init database.")
     makeJsonRequest(latestRateURL, jrates =>
       makeJsonRequest(currenciesNamesURL, jnames => {
         initExchangeRates(jrates, jnames)
         updateLastRateDate(jrates)
+        initialization_complete.release
       })
     )
+    return initialization_complete
   }
 
   def start() = {

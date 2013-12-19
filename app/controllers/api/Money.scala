@@ -5,17 +5,17 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
 
-import models.{Transfer, Currency}
+import models.{Transfer}
 import daos.{CurrencyDAO, UserDAO, AccountDAO}
 
 
 object Money extends Controller {
 
-  def doTransfer(userID: Long, transferFrom: Currency, transferTo: Currency, amount: Double) = {
-    implicit val currencyWriter = models.Currency.writeCurrency
-    implicit val writer = Json.writes[Transfer]
-    val result = AccountDAO.transfer(transferFrom, transferTo, amount, userID)
-    Json.toJson(result)
+  def makeTransferResponse(amount: Double) = {
+    Json.obj(
+      "status" -> "OK",
+      "amount" -> Json.toJson(amount)
+    )
   }
 
   def transfer = Action(parse.json) { request =>
@@ -27,12 +27,10 @@ object Money extends Controller {
       tupled
     )
     request.body.validate[(Long, Double, String, String)].fold(
-      valid = { x =>
-        val (userId, amount, fromCurrencyName, toCurrencyName) = x
+      valid = { case (userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
         val transfer = for {
-          fromCurrency <- daos.CurrencyDAO.findCurrentExchangeRate(fromCurrencyName)
-          toCurrency <- daos.CurrencyDAO.findCurrentExchangeRate(toCurrencyName)
-        } yield {Ok(doTransfer(userId, fromCurrency, toCurrency, amount))}
+          ratedAmount <- AccountDAO.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, userID)
+        } yield {Ok(makeTransferResponse(ratedAmount))}
         transfer.getOrElse(
           BadRequest(
             Json.obj(
@@ -42,10 +40,10 @@ object Money extends Controller {
           )
         )
       },
-      invalid = { error =>
-        BadRequest(Json.toJson(
-          Map("status" -> "KO", "error" -> s"The request is invalid. Error: ${error.toString}")))
-      }
+      invalid = { error => BadRequest(Json.toJson(Map(
+        "status" -> "KO", 
+        "error" -> s"The request is invalid. Error: ${error.toString}"
+      )))}
     )
   }
 }

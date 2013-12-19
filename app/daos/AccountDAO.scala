@@ -3,33 +3,43 @@ package daos
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import models.{Account, Currency}
+import models.{Account}
 
-object Transfer extends Table[(Long, String, Double, Long)]("Transfers") {
+object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def currency = column[String]("currency")
+  def currency = column[Long]("currency")
   def amount = column[Double]("amount")
   def owner = column[Long]("owner")
 
+  def currencyFK = foreignKey("CURRENCY_FK", currency, ExchangeRates)(_.id)
   def owningUserFK = foreignKey("ACCOUNT_FK", owner, UserTable)(_.id)
 
   def * = id ~ currency ~ amount ~ owner
 
   def autoInc = currency ~ amount ~ owner returning id
 
-  def add(currency: String, amount: Double, owner: Long)(implicit s: Session) : Long = autoInc.insert(currency, amount, owner)
+  def add(currency: Long, amount: Double, owner: Long)(implicit s: Session) : Long = 
+    autoInc.insert(currency, amount, owner)
 
 }
 
 object AccountDAO {
 
-  def transfer(fromCurrency: Currency, toCurrency: Currency, amount: Double, owner: Long) : models.Transfer = {
-    DBAccess.db withSession { implicit session : Session =>
-      Transfer.add(fromCurrency.name, - amount, owner)
-      Transfer.add(toCurrency.name, (amount * fromCurrency.currentRateAgainstDollar) / toCurrency.currentRateAgainstDollar, owner)
+  def computeRatedAmount(fromRate: Double, toRate: Double, amount: Double): Double = {
+    (1/fromRate) * amount * toRate
+  }
+
+  def transfer(fromCurrency: String, toCurrency: String, amount: Double, owner: Long) : Option[Double] = {
+    for(fromCur <- CurrencyDAO.getIDRate(fromCurrency);
+        toCur <- CurrencyDAO.getIDRate(toCurrency);
+        ratedAmount = computeRatedAmount(fromCur._2, toCur._2, amount))
+    yield {
+      DBAccess.db withSession { implicit session : Session =>
+        Transfer.add(fromCur._1, -amount, owner)
+        Transfer.add(toCur._1, ratedAmount, owner)}
+      ratedAmount
     }
-    models.Transfer(fromCurrency, toCurrency, amount, owner)
   }
 
   def findAccountByOwner(owner: Long): List[Account] = {
@@ -39,7 +49,7 @@ object AccountDAO {
         (currency, operations.map(_.amount).sum.getOrElse(0.0))
       }
       sumQuery.list.map{ case (currency, total) =>
-        CurrencyDAO.findCurrentExchangeRate(currency) map { Account(_, total, owner) }
+        CurrencyDAO.acronymOfCurrency(currency) map { Account(_, total, owner) }
       }.flatten
     }
   }
