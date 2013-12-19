@@ -18,6 +18,7 @@ object Global extends GlobalSettings {
 
     val INITIAL_MONEY = 300000
 
+    println("Initializing the database...")
     // Creation of the tables
     DBAccess.db withSession {
       (UserTable.ddl ++ Transfer.ddl ++ ExchangeRates.ddl ++ CurrencyStatus.ddl).create
@@ -30,12 +31,12 @@ object Global extends GlobalSettings {
       CurrencyStatus.init
     }
 
+    println("Initializing the exchange rates...")
     val init_complete = ExchangeRatesUpdater.init
     init_complete.acquire
     init_complete.release
 
-    println("Initialization complete.")
-
+    println("Fill the database with testing values...")
     // Fills the database (for testing purposes)
     DBAccess.db withSession {
 
@@ -46,7 +47,6 @@ object Global extends GlobalSettings {
       // Insert some suppliers
       for(idUser <- idUsers;
          idCur <- idUSD) {
-        println("Add this id: " + idCur)
         Transfer.add(idCur, INITIAL_MONEY, idUser)
       }
     }

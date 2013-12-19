@@ -51,11 +51,9 @@ object ExchangeRatesUpdater {
   }
 
   private def initExchangeRates(rates: JsValue, names: JsValue) = {
-    println("initExchangeRates")
     for(rate <- retrieveRates(rates);
         name <- retrieveNames(names)
         if (rate._1 == name._1)) {
-      println("In loop")
       CurrencyDAO.addRate(name._1, name._2, rate._2)
     }
   }
@@ -66,10 +64,12 @@ object ExchangeRatesUpdater {
     CurrencyDAO.updateLastRateDate(timestamp)
   }
 
+  // We need a lock telling when the database is initialized because init()
+  // is using asynchronous operation that can complete after the return.
+  // A more elegant solution might be to use something like Future[Void].
   def init(): Lock = {
     var initialization_complete = new Lock
     initialization_complete.acquire
-    println("Init database.")
     makeJsonRequest(latestRateURL, jrates =>
       makeJsonRequest(currenciesNamesURL, jnames => {
         initExchangeRates(jrates, jnames)
@@ -83,9 +83,10 @@ object ExchangeRatesUpdater {
   def start() = {
     running = true
     future {
+      Thread.sleep(refreshTime)
       while (running){
-        println("Update Database.")
         makeJsonRequest(latestRateURL, updateRates)
+        println("[ExchangeRates daemon] Database updated.")
         Thread.sleep(refreshTime)
       }
     }
