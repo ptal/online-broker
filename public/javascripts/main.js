@@ -5,9 +5,13 @@ var app = $.sammy("#main", function() {
 
   this.get('#/list/', function(context) {
     // fetch handlebars-partial first
-
-    this.load("/api/user/" + userId, {"cache": false}, function(userInfo){
-      this.render("/assets/templates/accounts.hb", JSON.parse(userInfo)).swap();
+    $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
+      var userInfo = userInfoText[0];
+      var currencies = currenciesText[0];
+      context.render("/assets/templates/accounts.hb", {
+        "currencies": currencies.currencies,
+        "userInfo": userInfo
+      }).swap();
     });
   });
 
