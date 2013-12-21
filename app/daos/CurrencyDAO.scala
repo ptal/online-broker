@@ -1,8 +1,13 @@
 package daos
 
+import java.sql.Date
+
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
-import java.sql.Date
+
+import play.api.libs.json.Json
+
+
 
 object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRates") {
 
@@ -21,6 +26,12 @@ object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRate
   def add(currencyAcronym: String, currencyName: String, exchangeRate: Double)(implicit s: Session) : Long =
     autoInc.insert(currencyAcronym, currencyName, exchangeRate)
 
+}
+
+case class ExchangeRate(id:Long, acronym:String, name:String, exchangeRate:Double)
+
+object ExchangeRate {
+  val writeExchangeRate = Json.format[ExchangeRate]
 }
 
 object CurrencyStatus extends Table[(Long, Date)]("CurrencyStatus") {
@@ -51,6 +62,16 @@ object CurrencyDAO {
         case (_, acronym, _, _) => acronym
       }
     }
+  }
+
+  def getAllCurrencies: List[ExchangeRate] = {
+    DBAccess.db withSession { implicit session : Session =>
+      val all = for {
+        rate <- ExchangeRates
+      } yield (rate.id, rate.currencyAcronym, rate.currencyName, rate.exchangeRate)
+      all.list.map(Function.tupled(ExchangeRate(_:Long,_:String,_:String,_:Double)))
+    }
+
   }
 
   def getIDRate(currencyAcronym: String): Option[(Long,Double)] = {

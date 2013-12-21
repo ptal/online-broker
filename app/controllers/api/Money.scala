@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
 
 import models.{Transfer}
-import daos.{CurrencyDAO, UserDAO, AccountDAO}
+import daos.{ExchangeRate, CurrencyDAO, UserDAO, AccountDAO}
 
 
 object Money extends Controller {
@@ -18,11 +18,19 @@ object Money extends Controller {
     )
   }
 
-  def listCurrencies = Action {
+  def listCurrenciesNames = Action {
     Ok(CurrencyDAO.nameOfAllCurrencies().foldLeft(new JsArray){
       case (jarray, (acronym, name)) =>
         jarray :+ new JsObject(List((acronym, new JsString(name))))
     })
+  }
+
+  def listCurrencies = Action {
+    implicit val writer = ExchangeRate.writeExchangeRate
+    Ok(Json.obj(
+      "status" -> "OK",
+      "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies)
+    ))
   }
 
   def transfer = Action(parse.json) { request =>

@@ -8,10 +8,10 @@
             <td>Amount</td>
         </tr>
     </thead>
-    {{#each accounts}}
+    {{#each userInfo.accounts}}
     <tbody>
         <tr>
-            <td>{{currency.name}}</td>
+            <td>{{currency}}</td>
             <td>{{amount}}</td>
         </tr>
     </tbody>
@@ -24,18 +24,19 @@
 
     <div class="pure-control-group">
         <label for="currencyFrom"> From Currency </label>
+
         <select name="currencyFrom" id="currency-from-choice">
-          <option value="Dollar">Dollar</option>
-          <option value="Euro">Euro</option>
-          <option value="Pound">Pound</option>
+        {{#each currencies}}
+          <option value="{{acronym}}">{{acronym}}({{exchangeRate}})</option>
+        {{/each}}
         </select>
     </div>
     <div class="pure-control-group">
         <label for="currencyTo"> To Currency </label>
         <select name="currencyTo" id="currency-to-choice">
-          <option value="Dollar">Dollar</option>
-          <option value="Euro">Euro</option>
-          <option value="Pound">Pound</option>
+          {{#each currencies}}
+            <option value="{{acronym}}">{{acronym}}({{exchangeRate}})</option>
+          {{/each}}
         </select>
     </div>
     <div class="pure-control-group">
