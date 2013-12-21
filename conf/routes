@@ -3,9 +3,10 @@
 # ~~~~
 
 # Home page
+GET   /api/currencies/names controllers.api.Money.listCurrencies()
 GET   /api/user/:id         controllers.api.UserController.index(id:Long)
 GET   /user/accounts/:id    controllers.html.MainController.userAccounts(id:Long)
-POST   /user/accounts/:id   controllers.html.MainController.userAccounts(id:Long)
+POST  /user/accounts/:id    controllers.html.MainController.userAccounts(id:Long)
 POST  /api/transfer         controllers.api.Money.transfer()
 
 # Map static resources from the /public folder to the /assets URL path

@@ -65,7 +65,7 @@ object ExchangeRatesUpdater {
   }
 
   // We need a lock telling when the database is initialized because init()
-  // is using asynchronous operation that can complete after the return.
+  // uses asynchronous operation that can complete after the return.
   // A more elegant solution might be to use something like Future[Void].
   def init(): Lock = {
     var initialization_complete = new Lock

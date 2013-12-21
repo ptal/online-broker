@@ -18,6 +18,13 @@ object Money extends Controller {
     )
   }
 
+  def listCurrencies = Action {
+    Ok(CurrencyDAO.nameOfAllCurrencies().foldLeft(new JsArray){
+      case (jarray, (acronym, name)) =>
+        jarray :+ new JsObject(List((acronym, new JsString(name))))
+    })
+  }
+
   def transfer = Action(parse.json) { request =>
     implicit val transferReads = (
       (__ \ "userId").read[Long] and
