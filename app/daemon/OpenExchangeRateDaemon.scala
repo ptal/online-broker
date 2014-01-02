@@ -86,7 +86,7 @@ object ExchangeRatesUpdater {
       Thread.sleep(refreshTime)
       while (running){
         makeJsonRequest(latestRateURL, updateRates)
-        println("[ExchangeRates daemon] Database updated.")
+        Logger.info("[ExchangeRates daemon] Database updated.")
         Thread.sleep(refreshTime)
       }
     }

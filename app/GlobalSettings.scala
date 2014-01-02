@@ -14,11 +14,11 @@ import daemon.ExchangeRatesUpdater
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
-    println("Starting the application.")
+    Logger.info("Starting the application.")
 
     val INITIAL_MONEY = 300000
 
-    println("Initializing the database...")
+    Logger.info("Initializing the database...")
     // Creation of the tables
     DBAccess.db withSession {
       (UserTable.ddl ++ Transfer.ddl ++ ExchangeRates.ddl ++ CurrencyStatus.ddl).create
@@ -31,12 +31,12 @@ object Global extends GlobalSettings {
       CurrencyStatus.init
     }
 
-    println("Initializing the exchange rates...")
+    Logger.info("Initializing the exchange rates...")
     val init_complete = ExchangeRatesUpdater.init
     init_complete.acquire
     init_complete.release
 
-    println("Fill the database with testing values...")
+    Logger.info("Fill the database with testing values...")
     // Fills the database (for testing purposes)
     DBAccess.db withSession {
 

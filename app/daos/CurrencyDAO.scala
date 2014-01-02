@@ -50,9 +50,10 @@ object CurrencyDAO {
 
   def nameOfAllCurrencies() : List[(String, String)] = {
     DBAccess.db withSession { implicit session =>
-      Query(ExchangeRates).sortBy(_.currencyAcronym).map {
-        case (_, acronym, name, _) => (acronym, name)
-      }
+      val all = for {
+        rate <- ExchangeRates
+      } yield (rate.currencyAcronym, rate.currencyName)
+      all.list
     }
   }
 
