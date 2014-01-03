@@ -1,4 +1,4 @@
-package daos
+package fr.jussieu.daos
 
 import scala.slick.session.Database
 

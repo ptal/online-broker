@@ -1,11 +1,12 @@
 package controllers.api
 
+
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import models.{UserAggregatedView, Account, User}
-import daos.UserDAO
+import fr.jussieu.daos.UserDAO
+import fr.jussieu.models.{UserAggregatedView, Account, User}
 
 
 object UserController extends Controller {

@@ -1,9 +1,10 @@
-package daos
+package fr.jussieu.daos
 
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
 
-import models.{Account}
+import fr.jussieu.models.Account
+
 
 object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {
 

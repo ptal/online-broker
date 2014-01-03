@@ -1,6 +1,4 @@
-package models
-
-import play.api.libs.json._
+package fr.jussieu.models
 
 case class User(id: Long, name: String)
 

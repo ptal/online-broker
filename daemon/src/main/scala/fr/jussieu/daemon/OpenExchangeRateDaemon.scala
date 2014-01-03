@@ -1,10 +1,15 @@
-package daemon
+package fr.jussieu.daemon
+
 
 import play.api._
 import play.api.libs.ws._
 import play.api.libs.json._
+import play.api.Play.current
+import play.api.test._
+import play.api.test.Helpers._
 
 import scala.concurrent._
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.slick.session.Database
@@ -12,11 +17,12 @@ import scala.slick.driver.H2Driver.simple._
 
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
+import fr.jussieu.daos.CurrencyDAO
 
-import daos.{ExchangeRates, CurrencyStatus, CurrencyDAO, DBAccess}
+
 
 object ExchangeRatesUpdater {
-  private var running = true
+
   /* Demo App ID */
   private def openExchangeRateAppID = "9178604be10e4dae8804db845912c9d3"
   private def latestRateURL = "http://openexchangerates.org/api/latest.json?app_id=" + openExchangeRateAppID
@@ -24,10 +30,12 @@ object ExchangeRatesUpdater {
 
   private def refreshTime = 60000000 // milliseconds
 
-  private def makeJsonRequest(url: String, handler: (JsValue => Unit)) = {
+  private def makeJsonRequest(url: String, handler: (JsValue => Unit)) : Future[Unit] = {
     val req = WS.url(url)
     val resp = req.get()
-    resp.onSuccess {
+    println(s"Requesting:$url")
+    println(resp)
+    resp.map {
       case jresp => handler(jresp.json)
     }
   }
@@ -81,18 +89,10 @@ object ExchangeRatesUpdater {
   }
 
   def start() = {
-    running = true
-    future {
-      Thread.sleep(refreshTime)
-      while (running){
-        makeJsonRequest(latestRateURL, updateRates)
-        Logger.info("[ExchangeRates daemon] Database updated.")
-        Thread.sleep(refreshTime)
-      }
+    running(FakeApplication()) {
+      Await.result(makeJsonRequest(latestRateURL, updateRates), DurationInt(10).seconds)
+      Logger.info("[ExchangeRates daemon] Database updated.")
     }
   }
 
-  def stop() = {
-    running = false
-  }
 }

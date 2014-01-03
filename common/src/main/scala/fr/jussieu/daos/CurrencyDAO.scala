@@ -1,12 +1,9 @@
-package daos
+package fr.jussieu.daos
 
 import java.sql.Date
 
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._
-
-import play.api.libs.json.Json
-
 
 
 object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRates") {
@@ -29,10 +26,6 @@ object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRate
 }
 
 case class ExchangeRate(id:Long, acronym:String, name:String, exchangeRate:Double)
-
-object ExchangeRate {
-  val writeExchangeRate = Json.format[ExchangeRate]
-}
 
 object CurrencyStatus extends Table[(Long, Date)]("CurrencyStatus") {
   

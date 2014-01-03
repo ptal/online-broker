@@ -1,12 +1,12 @@
 package controllers.api
 
+import fr.jussieu.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
 
-import models.{Transfer}
-import daos.{ExchangeRate, CurrencyDAO, UserDAO, AccountDAO}
+import fr.jussieu.models.Transfer
 
 
 object Money extends Controller {
@@ -26,7 +26,7 @@ object Money extends Controller {
   }
 
   def listCurrencies = Action {
-    implicit val writer = ExchangeRate.writeExchangeRate
+    implicit val writer = Json.writes[ExchangeRate]
     Ok(Json.obj(
       "status" -> "OK",
       "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies)
