@@ -3,7 +3,7 @@ var app = $.sammy("#main", function() {
   this.use('Handlebars', 'hb');
   this.use(Sammy.JSON);
 
-  this.get('#/list/', function(context) {
+  this.get('#/accounts/', function(context) {
     // fetch handlebars-partial first
     $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
       var userInfo = userInfoText[0];
@@ -14,6 +14,15 @@ var app = $.sammy("#main", function() {
       }).swap();
     });
   });
+
+  this.get('#/currencies/', function(context) {
+      // fetch handlebars-partial first
+      $.when($.ajax("/api/currencies")).done(function(currenciesText){
+        context.render("/assets/templates/currencies.hb", {
+          "currencies": currenciesText.currencies
+        }).swap();
+      });
+    });
 
   this.post('#/transfer/', function(context){
     transfer_currencies(context);
