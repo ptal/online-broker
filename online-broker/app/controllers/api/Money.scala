@@ -57,13 +57,13 @@ object Money extends Controller {
 
   def transfer = Action(parse.json) { request =>
     implicit val transferReads = (
-      (__ \ "userId").read[Long] and
+      (__ \ "userId").read[String] and
       (__ \ "amount").read[Double] and
       (__ \ "currencyFrom").read[String] and
       (__ \ "currencyTo").read[String]
       tupled
     )
-    request.body.validate[(Long, Double, String, String)].fold(
+    request.body.validate[(String, Double, String, String)].fold(
       valid = { case (userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
         val transfer = for {
           ratedAmount <- AccountDAO.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, userID)

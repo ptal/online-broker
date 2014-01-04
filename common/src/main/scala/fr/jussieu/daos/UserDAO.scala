@@ -10,14 +10,14 @@ import fr.jussieu.models.{UserAggregatedView, User}
 object UserTable extends Table[(Long, String)]("Users") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[String]("name")
+  def githubUserId = column[String]("providerId")
 
 
   //def lastSendTime = co lumn[Time]("lastSendTime")
 
-  def * = id ~ name
+  def * = id ~ githubUserId
 
-  def autoInc = name returning id
+  def autoInc = githubUserId returning id
 
   /**
    * Inserts a new user in the DB with its id automatically generated.
@@ -25,21 +25,21 @@ object UserTable extends Table[(Long, String)]("Users") {
    * @param userName name of the user
    * @return the id of the new created user
    */
-  def add(userName: String)(implicit s: Session) : Long = 
-    autoInc.insert(userName)
+  def add(githubUserId: String)(implicit s: Session) : Long =
+    autoInc.insert(githubUserId)
 
 }
 
 object UserDAO {
 
-  def findById(id: Long): Option[User] = {
+  def findByGithubUserId(githubUserId: String): Option[User] = {
     DBAccess.db withSession { implicit session =>
-      Query(UserTable).filter(_.id === id).firstOption.map(x => User(x._1, x._2))
+      Query(UserTable).filter(_.githubUserId === githubUserId).firstOption.map(x => User(x._1, x._2))
     }
   }
 
-  def findByIdWithAggView(userId: Long): Option[UserAggregatedView] = {
-    findById(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findAccountByOwner(userId).toSet) }
+  def findByIdWithAggView(userId: String): Option[UserAggregatedView] = {
+    findByGithubUserId(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findAccountByOwner(user.id).toSet) }
   }
 
 

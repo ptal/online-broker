@@ -20,9 +20,9 @@ object Authentication
   def subscribe(email: String, password: String): Either[String, OnlineBrokerError] = {
     val salt = generate_random_salt()
     val passwordHashed = hash_password(salt, password)
-    DBAccess.db withSession { implicit session: Session =>
-      tables.Users.insert(tables.User(None, email, password, salt))
-    }
+    //DBAccess.db withSession { implicit session: Session =>
+      //tables.Users.insert(tables.User(None, email, password, salt))
+    //}
     Left(makeTokenId())
   }
 }

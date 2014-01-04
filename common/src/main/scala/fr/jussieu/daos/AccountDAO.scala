@@ -31,14 +31,15 @@ object AccountDAO {
     (1/fromRate) * amount * toRate
   }
 
-  def transfer(fromCurrency: String, toCurrency: String, amount: Double, owner: Long) : Option[Double] = {
+  def transfer(fromCurrency: String, toCurrency: String, amount: Double, owner: String) : Option[Double] = {
     for(fromCur <- CurrencyDAO.getIDRate(fromCurrency);
         toCur <- CurrencyDAO.getIDRate(toCurrency);
+        user  <- UserDAO.findByGithubUserId(owner);
         ratedAmount = computeRatedAmount(fromCur._2, toCur._2, amount))
     yield {
       DBAccess.db withSession { implicit session : Session =>
-        Transfer.add(fromCur._1, -amount, owner)
-        Transfer.add(toCur._1, ratedAmount, owner)}
+        Transfer.add(fromCur._1, -amount, user.id)
+        Transfer.add(toCur._1, ratedAmount, user.id)}
       ratedAmount
     }
   }

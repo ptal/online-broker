@@ -2,6 +2,6 @@
 logLevel := Level.Warn
 
 // The Typesafe repository
-resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers += Resolver.url("Typesafe repository", new URL("http://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns)
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.1")

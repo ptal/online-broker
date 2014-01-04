@@ -9,7 +9,7 @@ var app = $.sammy("#main", function() {
     connection.onmessage = function (e) {} ;
   });
 
-  this.get('#/accounts/', function(context) {
+  this.get('#/', function(context) {
     // fetch handlebars-partial first
     $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
       var userInfo = userInfoText[0];
@@ -44,7 +44,8 @@ var app = $.sammy("#main", function() {
 });
 
 $(function() {
-  app.run()
+  app.run();
+  window.history.pushState({state:1}, "State 1", "#/");
 });
 
 function transfer_currencies(context) {
@@ -52,7 +53,7 @@ function transfer_currencies(context) {
           url: "/api/transfer",
           type: "post",
           data: JSON.stringify({
-            "userId": parseInt(userId),
+            "userId": userId,
             "currencyFrom": context.params.currencyFrom,
             "currencyTo": context.params.currencyTo,
             "amount" : parseInt(context.params.amount),
@@ -61,7 +62,7 @@ function transfer_currencies(context) {
           contentType: "application/json; charset=utf-8",
           success: function (data, text) {
             console.log(data);
-            context.redirect('#/accounts/');
+            context.redirect('#/');
           },
           error: function (request, status, error) {
             console.log(request.responseText);

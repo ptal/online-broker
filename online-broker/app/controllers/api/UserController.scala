@@ -11,13 +11,13 @@ import fr.jussieu.models.{UserAggregatedView, Account, User}
 
 object UserController extends Controller {
 
-  def index(id: Long) = Action {
+  def index(githubUserId: String) = Action {
 
     implicit val writeAccount : Writes[Account] = Json.writes[Account]
     implicit val writeUser : Writes[User] = Json.writes[User]
     implicit val writeUserAgg : Writes[UserAggregatedView] = Json.writes[UserAggregatedView]
 
-    UserDAO.findByIdWithAggView(id) match {
+    UserDAO.findByIdWithAggView(githubUserId) match {
       case Some(user) => Ok(Json.toJson(user))
       case None => NotFound("The user does not exist")
     }

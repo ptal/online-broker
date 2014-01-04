@@ -1,4 +1,4 @@
-@(githubUserId: String)
+@(form: Form[(String, String)],msg: Option[String] = None)
 
 <!DOCTYPE html>
 
@@ -10,27 +10,36 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/pure-min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")">
 
+
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/handlebars-v1.1.2.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/sammy.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/sammy.handlebars.js")" type="text/javascript"></script>
-        <script type="text/javascript">
-            var userId = "@githubUserId";
-        </script>
-        <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
+
+
     </head>
     <body class="pure-g yui3-normalized">
             <div id="headerMenu" class="pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
                 <a href="#" class="pure-u pure-menu-heading">Online-broker</a>
                 <ul>
-                    <li class="pure-u"><a href="/user/accounts#/" alt="Show my accounts">My Accounts</a></li>
+                    <li class="pure-u"><a href="/user/accounts#/accounts/" alt="Show my accounts">My Accounts</a></li>
                     <li class="pure-u"><a href="/user/accounts#/currencies/" alt="Show all currencies">Currencies</a></li>
                     <li class="pure-u"><a href="docs.html" alt="Documentation">Manual</a></li>
                 </ul>
             </div>
 
-            <div id="main" class="pure-u-1 content"></div>
+            <div id="main" class="pure-u-1 content">
+                <h2 class="content-subhead">Unauthorized Access</h2>
+                <div class="alert alert-danger">You're not logged in</div>
+                <p>
+                    Use your account in github to log in.
+                    <a href="/authenticate/github"> <img src="@routes.Assets.at("securesocial/images/providers/github.png")"> </a></div>
+                </p>
+
+
 
     </body>
 </html>
+
+

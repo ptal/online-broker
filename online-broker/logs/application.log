@@ -1,15 +1,60 @@
-2014-01-04 14:00:53,975 - [INFO] - from play in pool-51-thread-4 
+2014-01-05 00:10:51,406 - [INFO] - from play in pool-30-thread-4 
 Listening for HTTP on /0.0.0.0:9000
 
-2014-01-04 14:00:57,245 - [INFO] - from application in play-internal-execution-context-1 
+2014-01-05 00:11:12,130 - [INFO] - from application in play-internal-execution-context-1 
+[securesocial] loaded templates plugin: plugins.MyViews
+
+2014-01-05 00:11:12,351 - [INFO] - from play in play-internal-execution-context-1 
+Starting application default Akka system.
+
+2014-01-05 00:11:12,372 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+[securesocial] calling deleteExpiredTokens()
+
+2014-01-05 00:11:12,373 - [INFO] - from application in play-internal-execution-context-1 
+[securesocial] loaded user service: class controllers.api.MySQLUserService
+
+2014-01-05 00:11:12,374 - [INFO] - from application in play-internal-execution-context-1 
 Starting the application.
 
-2014-01-04 14:00:57,250 - [INFO] - from play in play-internal-execution-context-1 
+2014-01-05 00:11:12,375 - [INFO] - from application in play-internal-execution-context-1 
+[securesocial] loaded identity provider: github
+
+2014-01-05 00:11:12,380 - [INFO] - from play in play-internal-execution-context-1 
 Application started (Dev)
 
-2014-01-04 14:02:48,431 - [INFO] - from application in play-internal-execution-context-1 
-Starting the application.
+2014-01-05 00:11:12,473 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] anonymous user trying to access : '/user/accounts'
 
-2014-01-04 14:02:48,431 - [INFO] - from play in play-internal-execution-context-1 
-Application started (Dev)
+2014-01-05 00:11:12,476 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] bootstrap path = securesocial/bootstrap/css/bootstrap.min.css
+
+2014-01-05 00:11:12,477 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] assets controller = controllers.ReverseAssets
+
+2014-01-05 00:11:12,482 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] favicon path = securesocial/images/favicon.png
+
+2014-01-05 00:11:12,483 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] Jquery path = securesocial/javascripts/jquery-1.7.1.min.js
+
+2014-01-05 00:11:12,483 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] custom css path = None
+
+2014-01-05 00:11:14,530 - [DEBUG] - from application in play-akka.actor.default-dispatcher-7 
+[securesocial] authorizationUrl = https://github.com/login/oauth/authorize
+
+2014-01-05 00:11:14,530 - [DEBUG] - from application in play-akka.actor.default-dispatcher-7 
+[securesocial] redirecting to: [https://github.com/login/oauth/authorize?client_id=6fbaf112bda9850b1ee0&redirect_uri=http%3A%2F%2Fonlinebroker.com%3A9000%2Fauthenticate%2Fgithub&response_type=code&state=f04c0466-3193-45f1-b779-0a52bd4cbf93]
+
+2014-01-05 00:11:17,341 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+[securesocial] user = Some(SocialUser(IdentityId(,github),,,,None,None,AuthenticationMethod(oauth2),None,Some(OAuth2Info(d0c95c3ecee3125d8edf671fdea2438ffe6ddfe8,Some(bearer),None,None)),None))
+
+2014-01-05 00:11:21,612 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+[securesocial] user logged in : [SocialUser(IdentityId(225215,github),,,Inigo Mediavilla,None,Some(https://gravatar.com/avatar/9d22ec180716125f9878665cca52452f?d=https%3A%2F%2Fidenticons.github.com%2F3a68cb8fc67a627293a861b5db2e47c4.png&r=x),AuthenticationMethod(oauth2),None,Some(OAuth2Info(d0c95c3ecee3125d8edf671fdea2438ffe6ddfe8,Some(bearer),None,None)),None)]
+
+2014-01-05 00:12:09,710 - [INFO] - from application in pool-30-thread-4 
+[securesocial] unloaded identity provider: github
+
+2014-01-05 00:12:09,711 - [INFO] - from play in pool-30-thread-4 
+Shutdown application default Akka system.
 

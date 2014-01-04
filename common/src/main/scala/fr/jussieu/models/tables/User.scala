@@ -5,6 +5,7 @@ import scala.slick.driver.H2Driver.simple._
 
 case class User(
   id: Option[Long],
+  githubUserId: String,
   email: String,
   password: String,
   salt: String
@@ -13,11 +14,12 @@ case class User(
 object Users extends Table[User]("Users2") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def githubUserId = column[String]("providerId")
   def email = column[String]("email")
   def password = column[String]("password")
   def salt = column[String]("salt")
 
-  def * = id.? ~ email ~ password ~ salt <> (User, User.unapply _)
+  def * = id.? ~ githubUserId ~ email ~ password ~ salt <> (User, User.unapply _)
 
   def uniqueEmail = index("UNIQUE_EMAIL", email, unique = true)
   def autoInc = email ~ password ~ salt returning id
