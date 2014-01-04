@@ -1,4 +1,4 @@
-package models
+package fr.jussieu.models
 
 sealed trait OnlineBrokerError {
   def name: String

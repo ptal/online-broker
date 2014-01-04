@@ -3,7 +3,7 @@ package controllers.api
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import fr.jussieu.models._
+import fr.jussieu.models.OnlineBrokerError
 
 object GenericError {
 

@@ -1,4 +1,4 @@
-package models
+package fr.jussieu.models
 
 import scala.util._
 import scala.slick.session.Database

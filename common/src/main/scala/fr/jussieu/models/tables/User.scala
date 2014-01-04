@@ -1,4 +1,4 @@
-package models.tables
+package fr.jussieu.models.tables
 
 import scala.slick.session.Database
 import scala.slick.driver.H2Driver.simple._

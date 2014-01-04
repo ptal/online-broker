@@ -19,7 +19,7 @@ object Authentication extends Controller {
       "id-token" -> idToken)
 
   def subscribeData(data: SubscribeData) =
-    models.Authentication.subscribe(data.email, data.password) match {
+    fr.jussieu.models.Authentication.subscribe(data.email, data.password) match {
       case Left(idToken) => makeSubscribeResponse(idToken)
       case Right(error) => GenericError.makeErrorResponse(error)
     }
