@@ -1,0 +1,33 @@
+package models.tables
+
+import scala.slick.session.Database
+import scala.slick.driver.H2Driver.simple._
+
+case class User(
+  id: Option[Long],
+  email: String,
+  password: String,
+  salt: String
+)
+
+object Users extends Table[User]("Users2") {
+
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def email = column[String]("email")
+  def password = column[String]("password")
+  def salt = column[String]("salt")
+
+  def * = id.? ~ email ~ password ~ salt <> (User, User.unapply _)
+
+  def uniqueEmail = index("UNIQUE_EMAIL", email, unique = true)
+  def autoInc = email ~ password ~ salt returning id
+
+  /**
+   * Inserts a new user in the DB with its id automatically generated.
+   *
+   * @param userName name of the user
+   * @return the id of the new created user
+   */
+  def insert(user: User)(implicit s: Session) : Long = 
+    autoInc.insert(user.email, user.password, user.salt)
+}
