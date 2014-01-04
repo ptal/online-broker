@@ -50,11 +50,9 @@ object CurrencyDAO {
     }
   }
 
-  def acronymOfCurrency(id: Long): Option[String] = {
+  def getExchangeRate(id: Long): Option[ExchangeRate] = {
     DBAccess.db withSession { implicit session =>
-      Query(ExchangeRates).filter(_.id === id).sortBy(_.currencyAcronym).firstOption.map {
-        case (_, acronym, _, _) => acronym
-      }
+      Query(ExchangeRates).filter(_.id === id).sortBy(_.currencyAcronym).firstOption.map(x => Function.tupled(ExchangeRate.apply _)(x))
     }
   }
 

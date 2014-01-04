@@ -2,7 +2,7 @@ package fr.jussieu.models
 
 case class User(id: Long, name: String)
 
-case class Account(currency: String, amount: Double, owner: Long)
+case class Account(currencyAcronym: String, amount: Double, owner: Long, currencyName:String, currencyExchangeRate: Double)
 
 case class Transfer(currencyFrom: String, currencyTo: String, amount: Double, owner: Long)
 

@@ -3,6 +3,12 @@ var app = $.sammy("#main", function() {
   this.use('Handlebars', 'hb');
   this.use(Sammy.JSON);
 
+  var connection = new WebSocket('ws://localhost:9000/api/db/currenciesws', ['json']);
+
+  this.before(/.*/, function () {
+    connection.onmessage = function (e) {} ;
+  });
+
   this.get('#/accounts/', function(context) {
     // fetch handlebars-partial first
     $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
@@ -16,17 +22,25 @@ var app = $.sammy("#main", function() {
   });
 
   this.get('#/currencies/', function(context) {
-      // fetch handlebars-partial first
+
+      connection.onmessage = function (e) {
+        context.render("/assets/templates/currencies.hb", {
+          "currencies": JSON.parse(e.data)
+        }).swap();
+      };
+
       $.when($.ajax("/api/currencies")).done(function(currenciesText){
         context.render("/assets/templates/currencies.hb", {
           "currencies": currenciesText.currencies
         }).swap();
       });
+
     });
 
   this.post('#/transfer/', function(context){
     transfer_currencies(context);
   })
+
 });
 
 $(function() {
@@ -47,7 +61,7 @@ function transfer_currencies(context) {
           contentType: "application/json; charset=utf-8",
           success: function (data, text) {
             console.log(data);
-            context.redirect('#/list/');
+            context.redirect('#/accounts/');
           },
           error: function (request, status, error) {
             console.log(request.responseText);

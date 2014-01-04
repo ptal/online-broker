@@ -1,21 +1,24 @@
 
-<h2 class="content-subhead">Savings</h2>
+<h2 class="content-subhead">My Accounts</h2>
 
-<table class="pure-table pure-table-bordered">
+<table class="table table-striped">
     <thead>
         <tr>
-            <td>Currency</td>
-            <td>Amount</td>
+            <th>Currency Name</th>
+            <th>Currency Acronym</th>
+            <th>Amount</th>
         </tr>
     </thead>
-    {{#each userInfo.accounts}}
     <tbody>
+        {{#each userInfo.accounts}}
         <tr>
-            <td>{{currency}}</td>
+            <td>{{currencyName}}</td>
+            <td>{{currencyAcronym}}</td>
             <td>{{amount}}</td>
         </tr>
+        {{/each}}
     </tbody>
-    {{/each}}
+
 </table>
 
 <form method="POST" action="#/transfer/" class="pure-form pure-form-aligned">
@@ -26,8 +29,8 @@
         <label for="currencyFrom"> From Currency </label>
 
         <select name="currencyFrom" id="currency-from-choice">
-        {{#each currencies}}
-          <option value="{{acronym}}">{{acronym}}({{exchangeRate}})</option>
+        {{#each userInfo.accounts}}
+          <option value="{{currencyAcronym}}">{{currencyName}}({{currencyExchangeRate}})</option>
         {{/each}}
         </select>
     </div>
@@ -35,7 +38,7 @@
         <label for="currencyTo"> To Currency </label>
         <select name="currencyTo" id="currency-to-choice">
           {{#each currencies}}
-            <option value="{{acronym}}">{{acronym}}({{exchangeRate}})</option>
+            <option value="{{acronym}}">{{name}}({{exchangeRate}})</option>
           {{/each}}
         </select>
     </div>

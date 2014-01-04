@@ -1,15 +1,22 @@
 package controllers.api
 
-import fr.jussieu.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.data.validation.ValidationError
+
+import play.api.libs.iteratee.{Enumerator, Iteratee}
+import play.api.libs.iteratee.Concurrent
 
 import fr.jussieu.models.Transfer
+import fr.jussieu.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
 
 
 object Money extends Controller {
+
+  val (out, channel) = Concurrent.broadcast[String]
 
   def makeTransferResponse(amount: Double) = {
     Json.obj(
@@ -25,12 +32,27 @@ object Money extends Controller {
     })
   }
 
+  def updateCurrencies = Action { request =>
+    implicit val writer = Json.writes[ExchangeRate]
+    channel.push(Json.toJson(CurrencyDAO.getAllCurrencies).toString())
+    Ok("Updated Currencies.")
+  }
+
+  def listCurrenciesWebSocket = WebSocket.using[String] { request =>
+    // Log events to the console
+    val in = Iteratee.foreach[String](println).map { _ =>
+      println("Disconnected")
+    }
+    (in, out)
+  }
+
   def listCurrencies = Action {
     implicit val writer = Json.writes[ExchangeRate]
     Ok(Json.obj(
       "status" -> "OK",
-      "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies)
+      "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies.sortBy(_.name))
     ))
+
   }
 
   def transfer = Action(parse.json) { request =>
