@@ -3,6 +3,27 @@ Online broker
 
 Game where the user can buy and sell currencies to make money.
 
+Project's Structure
+=====================================
+
+The project is splitted into three subprojects. One
+that contains the website, another that contains a daemon
+that updates the db when the currencies' exchange rates
+change and another with code shared by the website and
+the daemon
+
+Update the database
+=====================================
+
+- To init the database the user needs to execute the class
+fr.jussieu.InitDB in the daemon.
+
+- To update the currencies the user needs to execute the class
+fr.jussieu.Daemon in the daemon.
+
+
+
+
 Dependencies
 =====================================
 - Play 2.2.1
