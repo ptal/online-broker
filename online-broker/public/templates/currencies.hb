@@ -3,9 +3,9 @@
 <table class="table table-striped"">
   <thead>
     <tr>
-        <td>Name</td>
-        <td>Acronym</td>
-        <td>ExchangeRate</td>
+        <th>Name</th>
+        <th>Acronym</th>
+        <th>ExchangeRate</th>
     </tr>
   </thead>
   <tbody>
