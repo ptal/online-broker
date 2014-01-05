@@ -1,7 +1,7 @@
 package fr.jussieu.models.tables
 
 import scala.slick.session.Database
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 
 case class User(
   id: Option[Long],
@@ -11,6 +11,7 @@ case class User(
   salt: String
 )
 
+//FIXME: If we don't use it in the end remove it
 object Users extends Table[User]("Users2") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)

@@ -1,5 +1,7 @@
 package fr.jussieu.models
 
+
+//FIXME: If we don't use it in the end remove it
 sealed trait OnlineBrokerError {
   def name: String
   def description: String

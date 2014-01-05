@@ -5,3 +5,7 @@
 9998:controllers.api.MySQLUserService
 10005:securesocial.core.providers.GitHubProvider
 
+100:play.api.i18n.MessagesPlugin
+1000:play.api.libs.concurrent.AkkaPlugin
+10000:play.api.GlobalPlugin
+

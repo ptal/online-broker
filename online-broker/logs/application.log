@@ -1,60 +1,70 @@
-2014-01-05 00:10:51,406 - [INFO] - from play in pool-30-thread-4 
+2014-01-05 02:04:23,356 - [INFO] - from play in pool-56-thread-1 
 Listening for HTTP on /0.0.0.0:9000
 
-2014-01-05 00:11:12,130 - [INFO] - from application in play-internal-execution-context-1 
-[securesocial] loaded templates plugin: plugins.MyViews
+2014-01-05 02:04:36,404 - [ERROR] - from application in New I/O worker #1 
 
-2014-01-05 00:11:12,351 - [INFO] - from play in play-internal-execution-context-1 
-Starting application default Akka system.
 
-2014-01-05 00:11:12,372 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
-[securesocial] calling deleteExpiredTokens()
+! @6gnpml98h - Internal server error, for (GET) [/user/accounts] ->
 
-2014-01-05 00:11:12,373 - [INFO] - from application in play-internal-execution-context-1 
-[securesocial] loaded user service: class controllers.api.MySQLUserService
+play.api.UnexpectedException: Unexpected exception[ObjectExistsException: Cache play already exists]
+	at play.core.ReloadableApplication$$anonfun$get$1$$anonfun$apply$1$$anonfun$1.apply(ApplicationProvider.scala:148) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.core.ReloadableApplication$$anonfun$get$1$$anonfun$apply$1$$anonfun$1.apply(ApplicationProvider.scala:112) ~[play_2.10-2.2.1.jar:2.2.1]
+	at scala.Option.map(Option.scala:145) ~[scala-library.jar:na]
+	at play.core.ReloadableApplication$$anonfun$get$1$$anonfun$apply$1.apply(ApplicationProvider.scala:112) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.core.ReloadableApplication$$anonfun$get$1$$anonfun$apply$1.apply(ApplicationProvider.scala:110) ~[play_2.10-2.2.1.jar:2.2.1]
+	at scala.util.Success.flatMap(Try.scala:200) ~[scala-library.jar:na]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:110) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.core.ReloadableApplication$$anonfun$get$1.apply(ApplicationProvider.scala:102) ~[play_2.10-2.2.1.jar:2.2.1]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.liftedTree1$1(Future.scala:24) ~[scala-library.jar:na]
+	at scala.concurrent.impl.Future$PromiseCompletingRunnable.run(Future.scala:24) ~[scala-library.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1361) ~[scala-library.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260) ~[scala-library.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339) ~[scala-library.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979) ~[scala-library.jar:na]
+	at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107) ~[scala-library.jar:na]
+Caused by: net.sf.ehcache.ObjectExistsException: Cache play already exists
+	at net.sf.ehcache.CacheManager.addCache(CacheManager.java:1171) ~[ehcache-core-2.6.6.jar:na]
+	at play.api.cache.EhCachePlugin.cache$lzycompute(Cache.scala:143) ~[play-cache_2.10-2.2.1.jar:2.2.1]
+	at play.api.cache.EhCachePlugin.cache(Cache.scala:142) ~[play-cache_2.10-2.2.1.jar:2.2.1]
+	at play.api.cache.EhCachePlugin.onStart(Cache.scala:159) ~[play-cache_2.10-2.2.1.jar:2.2.1]
+	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:88) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:88) ~[play_2.10-2.2.1.jar:2.2.1]
+	at scala.collection.immutable.List.foreach(List.scala:318) ~[scala-library.jar:na]
+	at play.api.Play$$anonfun$start$1.apply$mcV$sp(Play.scala:88) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.api.Play$$anonfun$start$1.apply(Play.scala:88) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.api.Play$$anonfun$start$1.apply(Play.scala:88) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.utils.Threads$.withContextClassLoader(Threads.scala:18) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.api.Play$.start(Play.scala:87) ~[play_2.10-2.2.1.jar:2.2.1]
+	at play.core.ReloadableApplication$$anonfun$get$1$$anonfun$apply$1$$anonfun$1.apply(ApplicationProvider.scala:139) ~[play_2.10-2.2.1.jar:2.2.1]
+	... 14 common frames omitted
 
-2014-01-05 00:11:12,374 - [INFO] - from application in play-internal-execution-context-1 
-Starting the application.
-
-2014-01-05 00:11:12,375 - [INFO] - from application in play-internal-execution-context-1 
-[securesocial] loaded identity provider: github
-
-2014-01-05 00:11:12,380 - [INFO] - from play in play-internal-execution-context-1 
-Application started (Dev)
-
-2014-01-05 00:11:12,473 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] anonymous user trying to access : '/user/accounts'
-
-2014-01-05 00:11:12,476 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] bootstrap path = securesocial/bootstrap/css/bootstrap.min.css
-
-2014-01-05 00:11:12,477 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] assets controller = controllers.ReverseAssets
-
-2014-01-05 00:11:12,482 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] favicon path = securesocial/images/favicon.png
-
-2014-01-05 00:11:12,483 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] Jquery path = securesocial/javascripts/jquery-1.7.1.min.js
-
-2014-01-05 00:11:12,483 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
-[securesocial] custom css path = None
-
-2014-01-05 00:11:14,530 - [DEBUG] - from application in play-akka.actor.default-dispatcher-7 
-[securesocial] authorizationUrl = https://github.com/login/oauth/authorize
-
-2014-01-05 00:11:14,530 - [DEBUG] - from application in play-akka.actor.default-dispatcher-7 
-[securesocial] redirecting to: [https://github.com/login/oauth/authorize?client_id=6fbaf112bda9850b1ee0&redirect_uri=http%3A%2F%2Fonlinebroker.com%3A9000%2Fauthenticate%2Fgithub&response_type=code&state=f04c0466-3193-45f1-b779-0a52bd4cbf93]
-
-2014-01-05 00:11:17,341 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
-[securesocial] user = Some(SocialUser(IdentityId(,github),,,,None,None,AuthenticationMethod(oauth2),None,Some(OAuth2Info(d0c95c3ecee3125d8edf671fdea2438ffe6ddfe8,Some(bearer),None,None)),None))
-
-2014-01-05 00:11:21,612 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
-[securesocial] user logged in : [SocialUser(IdentityId(225215,github),,,Inigo Mediavilla,None,Some(https://gravatar.com/avatar/9d22ec180716125f9878665cca52452f?d=https%3A%2F%2Fidenticons.github.com%2F3a68cb8fc67a627293a861b5db2e47c4.png&r=x),AuthenticationMethod(oauth2),None,Some(OAuth2Info(d0c95c3ecee3125d8edf671fdea2438ffe6ddfe8,Some(bearer),None,None)),None)]
-
-2014-01-05 00:12:09,710 - [INFO] - from application in pool-30-thread-4 
+2014-01-05 02:05:05,802 - [INFO] - from application in pool-56-thread-1 
 [securesocial] unloaded identity provider: github
 
-2014-01-05 00:12:09,711 - [INFO] - from play in pool-30-thread-4 
+2014-01-05 02:05:12,165 - [INFO] - from application in main 
+[securesocial] loaded templates plugin: plugins.MyViews
+
+2014-01-05 02:05:12,393 - [INFO] - from play in main 
+Starting application default Akka system.
+
+2014-01-05 02:05:12,412 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+[securesocial] calling deleteExpiredTokens()
+
+2014-01-05 02:05:12,413 - [INFO] - from application in main 
+[securesocial] loaded user service: class controllers.api.MySQLUserService
+
+2014-01-05 02:05:12,413 - [INFO] - from application in main 
+Starting the application.
+
+2014-01-05 02:05:12,413 - [INFO] - from application in main 
+Starting the application.
+
+2014-01-05 02:05:12,413 - [INFO] - from application in main 
+[securesocial] loaded identity provider: github
+
+2014-01-05 02:05:12,459 - [INFO] - from application in main 
+[securesocial] unloaded identity provider: github
+
+2014-01-05 02:05:12,460 - [INFO] - from play in main 
 Shutdown application default Akka system.
 

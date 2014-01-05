@@ -34,9 +34,9 @@ object ExchangeRatesUpdater {
     val req = WS.url(url)
     val resp = req.get()
     println(s"Requesting:$url")
-    println(resp)
     resp.map {
-      case jresp => handler(jresp.json)
+      case jresp =>
+        handler(jresp.json)
     }
   }
 
@@ -60,8 +60,7 @@ object ExchangeRatesUpdater {
 
   private def initExchangeRates(rates: JsValue, names: JsValue) = {
     for(rate <- retrieveRates(rates);
-        name <- retrieveNames(names)
-        if (rate._1 == name._1)) {
+        name <- retrieveNames(names) if (rate._1 == name._1)) {
       CurrencyDAO.addRate(name._1, name._2, rate._2)
     }
   }
@@ -75,17 +74,13 @@ object ExchangeRatesUpdater {
   // We need a lock telling when the database is initialized because init()
   // uses asynchronous operation that can complete after the return.
   // A more elegant solution might be to use something like Future[Void].
-  def init(): Lock = {
-    var initialization_complete = new Lock
-    initialization_complete.acquire
+  def init() = {
     makeJsonRequest(latestRateURL, jrates =>
       makeJsonRequest(currenciesNamesURL, jnames => {
         initExchangeRates(jrates, jnames)
         updateLastRateDate(jrates)
-        initialization_complete.release
       })
     )
-    return initialization_complete
   }
 
   def start() = {

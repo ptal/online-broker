@@ -3,7 +3,7 @@ package fr.jussieu.daos
 import java.sql.Date
 
 import scala.slick.session.Database
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 
 
 object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRates") {

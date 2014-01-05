@@ -3,7 +3,7 @@ package fr.jussieu.daos
 import java.sql.{Time, Date}
 
 import scala.slick.session.Database
-import scala.slick.driver.H2Driver.simple._
+import scala.slick.driver.MySQLDriver.simple._
 
 import fr.jussieu.models.{UserAggregatedView, User}
 

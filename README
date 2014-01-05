@@ -22,7 +22,20 @@ fr.jussieu.InitDB in the daemon.
 fr.jussieu.Daemon in the daemon.
 
 
+Database Connection parameters
+======================================
 
+The parameters to connect to the db should be stored in ~/.aar-sqlcredentials.
+They cannot be stored in the github repo because they change between the
+dev and prod environments and for obvious security reasons.
+
+How to package the daemon and the web
+======================================
+
+To deploy the webapp from the onlineBroker project use the command dist that generates
+a zip file.
+
+To deploy the daemon from the daemon project use the command assembly
 
 Dependencies
 =====================================

@@ -1,11 +1,10 @@
 package fr.jussieu.models
 
 import scala.util._
-import scala.slick.session.Database
-import scala.slick.driver.H2Driver.simple._
 
 import fr.jussieu.daos.DBAccess
 
+//FIXME: If we don't use it in the end remove it
 object Authentication 
 {
   def makeTokenId(): String = "TESTTOKENID124398E,RINUC"
