@@ -40,8 +40,9 @@ To deploy the daemon from the daemon project use the command assembly
 TODO
 ======================================
 
-When the daemon finishes it should call /api/db/updated/ and when the html table
+-When the daemon finishes it should call /api/db/updated/ and when the html table
 is updated in the currencies page it should be updated with a transition (e.g jquery ui)
+-Add total amount in dollars in My Accounts page
 
 Running webapp
 =======================================
