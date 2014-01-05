@@ -49,6 +49,18 @@ Running webapp
 The webapp runs in a tmux terminal. To restart it or see the logs live, we need
 to run "tmux attach" from the amazon instance.
 
+Notes
+=======================================
+
+-Since the application uses securesocial to login users through their github accounts
+the development environment needs modifications for oauth to work in the developement
+environment. While developing the app the user needs to add the following to its
+/etc/hosts file to be able to login:
+
+127.0.0.1   ec2-54-194-70-170.eu-west-1.compute.amazonaws.com
+
+This needs to be removed to be able to test the application on prod again.
+
 
 Dependencies
 =====================================
