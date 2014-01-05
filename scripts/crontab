@@ -1,0 +1,2 @@
+# For the moment running only every three hours (to save amazon resources)
+0 0-23/3 * * * /home/ubuntu/online-broker/daemon/run-daemon.sh

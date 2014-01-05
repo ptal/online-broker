@@ -37,6 +37,19 @@ a zip file.
 
 To deploy the daemon from the daemon project use the command assembly
 
+TODO
+======================================
+
+When the daemon finishes it should call /api/db/updated/ and when the html table
+is updated in the currencies page it should be updated with a transition (e.g jquery ui)
+
+Running webapp
+=======================================
+
+The webapp runs in a tmux terminal. To restart it or see the logs live, we need
+to run "tmux attach" from the amazon instance.
+
+
 Dependencies
 =====================================
 - Play 2.2.1

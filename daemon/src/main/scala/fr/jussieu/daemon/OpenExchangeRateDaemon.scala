@@ -85,7 +85,7 @@ object ExchangeRatesUpdater {
 
   def start() = {
     running(FakeApplication()) {
-      Await.result(makeJsonRequest(latestRateURL, updateRates), DurationInt(10).seconds)
+      Await.result(makeJsonRequest(latestRateURL, updateRates), DurationInt(20).seconds)
       Logger.info("[ExchangeRates daemon] Database updated.")
     }
   }
