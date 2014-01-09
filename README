@@ -26,37 +26,31 @@ Database Connection parameters
 ======================================
 
 The parameters to connect to the db should be stored in ~/.aar-sqlcredentials.
-They cannot be stored in the github repo because they change between the
-dev and prod environments and for obvious security reasons.
+They cannot be stored in the github repo because they change between the dev and prod environments and for obvious security reasons.
 
 How to package the daemon and the web
 ======================================
 
-To deploy the webapp from the onlineBroker project use the command dist that generates
-a zip file.
+To deploy the webapp from the onlineBroker project use the command dist that generates a zip file.
 
 To deploy the daemon from the daemon project use the command assembly
 
 TODO
 ======================================
 
--When the daemon finishes it should call /api/db/updated/ and when the html table
-is updated in the currencies page it should be updated with a transition (e.g jquery ui)
+-When the daemon finishes it should call /api/db/updated/ and when the html table is updated in the currencies page it should be updated with a transition (e.g jquery ui)
+
 -Add total amount in dollars in My Accounts page
 
 Running webapp
 =======================================
 
-The webapp runs in a tmux terminal. To restart it or see the logs live, we need
-to run "tmux attach" from the amazon instance.
+The webapp runs in a tmux terminal. To restart it or see the logs live, we need to run "tmux attach" from the amazon instance.
 
 Notes
 =======================================
 
--Since the application uses securesocial to login users through their github accounts
-the development environment needs modifications for oauth to work in the developement
-environment. While developing the app the user needs to add the following to its
-/etc/hosts file to be able to login:
+-Since the application uses securesocial to login users through their github accounts the development environment needs modifications for oauth to work in the developement environment. While developing the app the user needs to add the following to its /etc/hosts file to be able to login:
 
 127.0.0.1   ec2-54-194-70-170.eu-west-1.compute.amazonaws.com
 

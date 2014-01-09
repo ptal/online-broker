@@ -2,7 +2,9 @@ name := "online-broker"
 
 version := "1.0-SNAPSHOT"
 
-resolvers += Resolver.url("sbt-plugins-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugins-releases/"))(Resolver.ivyStylePatterns)
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+resolvers += Resolver.url("sbt-plugins-releases", new URL("http://repo.scala-sbt.org/scalasbt/simple/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
 
 libraryDependencies ++= Seq(
   jdbc,
