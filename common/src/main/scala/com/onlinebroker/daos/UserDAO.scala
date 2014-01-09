@@ -1,11 +1,11 @@
-package daos
+package com.onlinebroker.daos
 
 import java.sql.{Time, Date}
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import models.{UserAggregatedView, User}
+import com.onlinebroker.models.{UserAggregatedView, User}
 
 object UserTable extends Table[(Long, String)]("Users") {
 

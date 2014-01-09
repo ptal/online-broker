@@ -1,4 +1,4 @@
-package daemon
+package com.onlinebroker.daemon
 
 import play.api.Logger
 
@@ -7,7 +7,7 @@ import scala.slick.driver.MySQLDriver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import fr.jussieu.daos._
+import com.onlinebroker.daos._
 
 object Daemon extends App {
   ExchangeRatesUpdater.start

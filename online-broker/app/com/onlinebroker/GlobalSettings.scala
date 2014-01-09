@@ -1,3 +1,5 @@
+package com.onlinebroker
+
 import play.api._
 
 import scala.slick.session.Database

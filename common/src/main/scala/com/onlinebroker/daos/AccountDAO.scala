@@ -1,9 +1,9 @@
-package daos
+package com.onlinebroker.daos
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import models.Account
+import com.onlinebroker.models.Account
 
 
 object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {

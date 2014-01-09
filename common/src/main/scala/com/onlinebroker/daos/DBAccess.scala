@@ -1,7 +1,7 @@
-package daos
+package com.onlinebroker.daos
 
 import scala.slick.session.Database
-import daos.config.ConfigSQL
+import com.onlinebroker.daos.config.ConfigSQL
 
 object DBAccess {
 

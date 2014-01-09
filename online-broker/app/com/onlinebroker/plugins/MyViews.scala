@@ -1,4 +1,4 @@
-package plugins
+package com.onlinebroker.plugins
 
 import play.api.mvc._
 
@@ -9,8 +9,10 @@ import securesocial.core.{Identity, SecuredRequest, SocialUser}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo
-import  securesocial.controllers.TemplatesPlugin
+import securesocial.controllers.TemplatesPlugin
 import securesocial.controllers.DefaultTemplatesPlugin
+
+import com.onlinebroker.views
 
 class MyViews(application: play.Application) extends TemplatesPlugin
 {

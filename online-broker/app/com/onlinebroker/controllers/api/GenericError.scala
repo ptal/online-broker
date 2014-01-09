@@ -1,9 +1,9 @@
-package controllers.api
+package com.onlinebroker.controllers.api
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import models.OnlineBrokerError
+import com.onlinebroker.models.OnlineBrokerError
 
 object GenericError {
 

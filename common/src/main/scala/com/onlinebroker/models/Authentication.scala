@@ -1,8 +1,8 @@
-package models
+package com.onlinebroker.models
 
 import scala.util._
 
-import daos.DBAccess
+import com.onlinebroker.daos.DBAccess
 
 //FIXME: If we don't use it in the end remove it
 object Authentication 

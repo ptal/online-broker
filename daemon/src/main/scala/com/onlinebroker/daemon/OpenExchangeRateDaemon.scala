@@ -1,4 +1,4 @@
-package daemon
+package com.onlinebroker.daemon
 
 
 import play.api._
@@ -19,7 +19,7 @@ import java.sql.Timestamp
 
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
-import fr.jussieu.daos.{DBAccess, DBUpdate, CurrencyDAO}
+import com.onlinebroker.daos.{DBAccess, DBUpdate, CurrencyDAO}
 
 
 trait Config {

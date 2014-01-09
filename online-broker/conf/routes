@@ -3,15 +3,15 @@
 # ~~~~
 
 # Home page
-GET   /api/currencies/names controllers.api.Money.listCurrenciesNames()
-GET   /api/user/:id         controllers.api.UserController.index(id:String)
-GET   /api/currencies       controllers.api.Money.listCurrencies
-GET   /user/accounts    controllers.html.MainController.userAccounts
+GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames()
+GET   /api/user/:id         com.onlinebroker.controllers.api.UserController.index(id:String)
+GET   /api/currencies       com.onlinebroker.controllers.api.Money.listCurrencies
+GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 
-GET   /api/db/updated/      controllers.api.Money.updateCurrencies
-GET   /api/db/currenciesws  controllers.api.Money.listCurrenciesWebSocket
+GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
+GET   /api/db/currenciesws  com.onlinebroker.controllers.api.Money.listCurrenciesWebSocket
 
-POST  /api/transfer         controllers.api.Money.transfer()
+POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file       controllers.Assets.at(path="/public", file)

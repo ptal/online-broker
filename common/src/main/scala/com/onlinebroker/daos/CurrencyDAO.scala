@@ -1,4 +1,4 @@
-package daos
+package com.onlinebroker.daos
 
 import java.sql.{Timestamp, Date}
 

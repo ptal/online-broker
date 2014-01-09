@@ -1,12 +1,12 @@
-package controllers.api
+package com.onlinebroker.controllers.api
 
 
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-import daos.UserDAO
-import models.{UserAggregatedView, Account, User}
+import com.onlinebroker.daos.UserDAO
+import com.onlinebroker.models.{UserAggregatedView, Account, User}
 
 
 object UserController extends Controller {

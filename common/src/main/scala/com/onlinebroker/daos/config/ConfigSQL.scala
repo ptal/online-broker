@@ -1,4 +1,4 @@
-package daos.config
+package com.onlinebroker.daos.config
 
 import com.typesafe.config.ConfigFactory
 

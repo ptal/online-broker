@@ -1,4 +1,4 @@
-package models.tables
+package com.onlinebroker.models.tables
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._

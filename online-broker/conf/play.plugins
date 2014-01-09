@@ -1,8 +1,8 @@
 9994:securesocial.core.DefaultAuthenticatorStore
 9995:securesocial.core.DefaultIdGenerator
 #9997:securesocial.controllers.DefaultTemplatesPlugin
-9997:plugins.MyViews
-9998:controllers.api.MySQLUserService
+9997:com.onlinebroker.plugins.MyViews
+9998:com.onlinebroker.controllers.api.MySQLUserService
 10005:securesocial.core.providers.GitHubProvider
 
 100:play.api.i18n.MessagesPlugin

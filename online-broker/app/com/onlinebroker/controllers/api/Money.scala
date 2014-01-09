@@ -1,5 +1,4 @@
-package controllers.api
-
+package com.onlinebroker.controllers.api
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -10,8 +9,8 @@ import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
-import models.Transfer
-import daos.{CurrencyDAO, ExchangeRate, AccountDAO}
+import com.onlinebroker.models.Transfer
+import com.onlinebroker.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
 
 
 object Money extends Controller {

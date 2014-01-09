@@ -1,4 +1,4 @@
-package models
+package com.onlinebroker.models
 
 case class User(id: Long, userProviderId: String)
 
