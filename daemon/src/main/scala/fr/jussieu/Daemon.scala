@@ -7,7 +7,7 @@ import scala.slick.driver.MySQLDriver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import fr.jussieu.daemon.ExchangeRatesUpdater
+import fr.jussieu.daemon.{CurrenciesInitializer, ExchangeRatesUpdater}
 import fr.jussieu.daos._
 
 object Daemon extends App {
@@ -22,17 +22,18 @@ object InitDB extends App {
   Logger.info("Initializing the database...")
   // Creation of the tables
   DBAccess.db withSession {
-    val ddl = (Transfer.ddl ++ CurrencyStatus.ddl ++ ExchangeRates.ddl ++ UserTable.ddl)
-    ddl.drop
+    val ddl = (Transfer.ddl ++ Currencies.ddl ++ DBUpdate.ddl ++ ExchangeRates.ddl ++ UserTable.ddl)
+    //ddl.drop
     ddl.create
 
-    Query(ExchangeRates).delete
-    Query(CurrencyStatus).delete
-    Query(UserTable).delete
-    Query(Transfer).delete
+    //Query(ExchangeRates).delete
+    //Query(Currencies).delete
+    //Query(DBUpdate).delete
+    //Query(UserTable).delete
+    //Query(Transfer).delete
 
-    ExchangeRatesUpdater.init()
-    CurrencyStatus.init
+    CurrenciesInitializer.init()
+    ExchangeRatesUpdater.start()
   }
 
 }

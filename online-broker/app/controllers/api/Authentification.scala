@@ -70,7 +70,7 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
       UserDAO.findByGithubUserId(user.identityId.userId) match {
         case None =>
           val userId = UserTable.add(user.identityId.userId)
-          CurrencyDAO.getIDRate("USD").foreach(x => Transfer.add(x._1, INITIAL_MONEY, userId))
+          CurrencyDAO.getLastExchangeRate("USD").foreach(x => Transfer.add(x.currencyId, INITIAL_MONEY, userId))
         case Some(user) => ()
       }
     }

@@ -1,58 +1,85 @@
 package fr.jussieu.daos
 
-import java.sql.Date
+import java.sql.{Timestamp, Date}
+
+import scalaz.syntax.validation._
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
 
-object ExchangeRates extends Table[(Long, String, String, Double)]("ExchangeRates") {
+object Currencies extends Table[(Long, String, String)]("Currencies") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def currencyAcronym = column[String]("currencyAcronym")
   def currencyName = column[String]("currencyName")
-  def exchangeRate = column[Double]("exchangeRate")
 
 
-  def * = id ~ currencyAcronym ~ currencyName ~ exchangeRate
+  def * = id ~ currencyAcronym ~ currencyName
 
-  def autoInc = currencyAcronym ~ currencyName ~ exchangeRate returning id
+  def autoInc = currencyAcronym ~ currencyName returning id
 
   def uniqueAcronym = index("IDX_ACRONYM", currencyAcronym, unique = true)
-  
-  def add(currencyAcronym: String, currencyName: String, exchangeRate: Double)(implicit s: Session) : Long =
-    autoInc.insert(currencyAcronym, currencyName, exchangeRate)
+
+  def add(currencyAcronym: String, currencyName: String)(implicit s: Session) : Long =
+    autoInc.insert(currencyAcronym, currencyName)
 
 }
 
-case class ExchangeRate(id:Long, acronym:String, name:String, exchangeRate:Double)
+object ExchangeRates extends Table[(Long, Long, Double, Long)]("ExchangeRates") {
 
-object CurrencyStatus extends Table[(Long, Date)]("CurrencyStatus") {
-  
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def lastExchangeRateUpdate = column[Date]("lastExchangeRateUpdate")
+  def currency = column[Long]("currency")
+  def exchangeRate = column[Double]("exchangeRate")
+  def dbUpdate = column[Long]("dbUpdate")
 
-  def * = id ~ lastExchangeRateUpdate
-  def autoInc = lastExchangeRateUpdate returning id
+  def currencyFK = foreignKey("CURRENCY_FK", currency, Currencies)(_.id)
+  def dbUpdateFK = foreignKey("DBUPDATE_FK", dbUpdate, DBUpdate)(_.id)
 
-  def init(implicit s: Session): Long =
-    autoInc.insert(new Date(0))
+  def * = id ~ currency ~ exchangeRate ~ dbUpdate
+
+  def autoInc = currency ~ exchangeRate ~ dbUpdate returning id
+
+  def add(currency: Long, exchangeRate: Double, dbUpdate: Long)(implicit s: Session) : Long =
+    autoInc.insert(currency, exchangeRate, dbUpdate)
+
 }
+
+object DBUpdate extends Table[(Long, Timestamp)]("DBUpdates") {
+
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def date = column[Timestamp]("date")
+
+  def * = id ~ date
+
+  def autoInc = date returning id
+
+  def add(date: Timestamp)(implicit s: Session) : Long =
+    autoInc.insert(date)
+
+}
+
+
+case class ExchangeRate(currencyId:Long, acronym:String, name:String, exchangeRate:Double, dbUpdate: Long)
 
 object CurrencyDAO {
 
   def nameOfAllCurrencies() : List[(String, String)] = {
     DBAccess.db withSession { implicit session =>
       val all = for {
-        rate <- ExchangeRates
+        rate <- Currencies
       } yield (rate.currencyAcronym, rate.currencyName)
       all.list
     }
   }
 
-  def getExchangeRate(id: Long): Option[ExchangeRate] = {
+  def getExchangeRate(currencyId: Long): Option[ExchangeRate] = {
     DBAccess.db withSession { implicit session =>
-      Query(ExchangeRates).filter(_.id === id).sortBy(_.currencyAcronym).firstOption.map(x => Function.tupled(ExchangeRate.apply _)(x))
+      val all = for {
+        currencies <- Currencies if currencies.id === currencyId
+        exchangeRates <- ExchangeRates if exchangeRates.currency === currencyId
+      } yield((currencyId, currencies.currencyAcronym, currencies.currencyName, exchangeRates.exchangeRate, exchangeRates.dbUpdate))
+      all.sortBy(_._5).firstOption.map(x => Function.tupled(ExchangeRate.apply _)(x))
     }
   }
 
@@ -60,39 +87,44 @@ object CurrencyDAO {
     DBAccess.db withSession { implicit session : Session =>
       val all = for {
         rate <- ExchangeRates
-      } yield (rate.id, rate.currencyAcronym, rate.currencyName, rate.exchangeRate)
-      all.list.map(Function.tupled(ExchangeRate(_:Long,_:String,_:String,_:Double)))
+        currency <- Currencies if rate.currency === currency.id
+      } yield (currency.id, currency.currencyAcronym, currency.currencyName, rate.exchangeRate, rate.dbUpdate)
+      all.list.map(Function.tupled(ExchangeRate(_:Long,_:String,_:String,_:Double,_:Long)))
     }
 
   }
 
-  def getIDRate(currencyAcronym: String): Option[(Long,Double)] = {
+  def getLastExchangeRate(currencyAcronym: String): Option[ExchangeRate] = {
     DBAccess.db withSession { implicit session =>
-      Query(ExchangeRates).filter(_.currencyAcronym === currencyAcronym).firstOption.map {
-        case (id,_,_,rate) => (id, rate)
+      Query(Currencies).filter(_.currencyAcronym === currencyAcronym).firstOption.flatMap {
+        case (id,_,_) => getExchangeRate(id)
       }
     }
   }
 
-  def updateRate(currencyAcronym: String, rate: Double) = {
-    DBAccess.db withSession { implicit session : Session =>
-      val q = for { 
-        a <- ExchangeRates if a.currencyAcronym === currencyAcronym 
-      } yield a.exchangeRate
-      q.update(rate)
+  def getCurrencyId(currencyAcronym: String): Option[Long] = {
+    DBAccess.db withSession { implicit session =>
+      Query(Currencies).filter(_.currencyAcronym === currencyAcronym).firstOption.map {
+        case (id,_,_) => id
+      }
     }
   }
 
-  def addRate(currencyAcronym: String, currencyName: String, rate: Double) = {
+  def addCurrency(currencyAcronym: String, currencyName: String) = {
     DBAccess.db withSession { implicit session : Session =>
-      ExchangeRates.add(currencyAcronym, currencyName, rate)
+      Currencies.add(currencyAcronym, currencyName)
     }
   }
 
-  def updateLastRateDate(timestamp: Long) =
+
+  def updateRate(currencyAcronym: String, rate: Double, dbUpdate : Long) = {
     DBAccess.db withSession { implicit session : Session =>
-      val q = for { a <- CurrencyStatus } yield a.lastExchangeRateUpdate
-      q.update(new Date(timestamp))
-   }
+      getCurrencyId(currencyAcronym).fold ( {
+        s"Trying to add rate for currency : $currencyAcronym that's not in the db.".failNel[Long]
+      })({ currencyId =>
+        ExchangeRates.add(currencyId, rate, dbUpdate).successNel[String]
+      })
+    }
+  }
 
 }

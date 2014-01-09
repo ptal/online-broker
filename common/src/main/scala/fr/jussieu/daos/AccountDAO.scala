@@ -13,8 +13,8 @@ object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {
   def amount = column[Double]("amount")
   def owner = column[Long]("owner")
 
-  def currencyFK = foreignKey("CURRENCY_FK", currency, ExchangeRates)(_.id)
-  def owningUserFK = foreignKey("ACCOUNT_FK", owner, UserTable)(_.id)
+  def currencyFK = foreignKey("TR_CURRENCY_FK", currency, ExchangeRates)(_.id)
+  def owningUserFK = foreignKey("TR_ACCOUNT_FK", owner, UserTable)(_.id)
 
   def * = id ~ currency ~ amount ~ owner
 
@@ -32,14 +32,14 @@ object AccountDAO {
   }
 
   def transfer(fromCurrency: String, toCurrency: String, amount: Double, owner: String) : Option[Double] = {
-    for(fromCur <- CurrencyDAO.getIDRate(fromCurrency);
-        toCur <- CurrencyDAO.getIDRate(toCurrency);
+    for(fromCur <- CurrencyDAO.getLastExchangeRate(fromCurrency);
+        toCur <- CurrencyDAO.getLastExchangeRate(toCurrency);
         user  <- UserDAO.findByGithubUserId(owner);
-        ratedAmount = computeRatedAmount(fromCur._2, toCur._2, amount))
+        ratedAmount = computeRatedAmount(fromCur.exchangeRate, toCur.exchangeRate, amount))
     yield {
       DBAccess.db withSession { implicit session : Session =>
-        Transfer.add(fromCur._1, -amount, user.id)
-        Transfer.add(toCur._1, ratedAmount, user.id)}
+        Transfer.add(fromCur.currencyId, -amount, user.id)
+        Transfer.add(toCur.currencyId, ratedAmount, user.id)}
       ratedAmount
     }
   }
