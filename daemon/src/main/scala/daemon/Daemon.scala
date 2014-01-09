@@ -1,4 +1,4 @@
-package fr.jussieu
+package daemon
 
 import play.api.Logger
 
@@ -7,7 +7,6 @@ import scala.slick.driver.MySQLDriver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import fr.jussieu.daemon.{CurrenciesInitializer, ExchangeRatesUpdater}
 import fr.jussieu.daos._
 
 object Daemon extends App {
@@ -16,8 +15,6 @@ object Daemon extends App {
 
 object InitDB extends App {
   val INITIAL_MONEY = 300000
-
-
 
   Logger.info("Initializing the database...")
   // Creation of the tables

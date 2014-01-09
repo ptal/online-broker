@@ -1,4 +1,4 @@
-package fr.jussieu.daemon
+package daemon
 
 
 import play.api._
