@@ -10,8 +10,8 @@ import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
-import fr.jussieu.models.Transfer
-import fr.jussieu.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
+import models.Transfer
+import daos.{CurrencyDAO, ExchangeRate, AccountDAO}
 
 
 object Money extends Controller {

@@ -1,8 +1,8 @@
-package fr.jussieu.models
+package models
 
 import scala.util._
 
-import fr.jussieu.daos.DBAccess
+import daos.DBAccess
 
 //FIXME: If we don't use it in the end remove it
 object Authentication 

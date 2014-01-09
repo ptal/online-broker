@@ -14,16 +14,16 @@ import securesocial.core.providers.Token
 import securesocial.core.IdentityId
 
 
-import fr.jussieu.models._
-import fr.jussieu.daos._
+import models._
+import daos._
 import scala.util.Left
 import controllers.api.SubscribeData
 import securesocial.core.IdentityId
-import fr.jussieu.models.MalformedRequest
+import models.MalformedRequest
 import securesocial.core.providers.Token
 import scala.util.Right
 
-import fr.jussieu.daos.Transfer
+import daos.Transfer
 
 case class SubscribeData(email: String, password: String)
 
@@ -36,7 +36,7 @@ object Authentication extends Controller {
       "id-token" -> idToken)
 
   def subscribeData(data: SubscribeData) =
-    fr.jussieu.models.Authentication.subscribe(data.email, data.password) match {
+    models.Authentication.subscribe(data.email, data.password) match {
       case Left(idToken) => makeSubscribeResponse(idToken)
       case Right(error) => GenericError.makeErrorResponse(error)
     }

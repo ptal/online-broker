@@ -1,4 +1,4 @@
-package fr.jussieu.daos.config
+package daos.config
 
 import com.typesafe.config.ConfigFactory
 

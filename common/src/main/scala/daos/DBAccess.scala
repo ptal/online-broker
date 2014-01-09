@@ -1,7 +1,7 @@
-package fr.jussieu.daos
+package daos
 
 import scala.slick.session.Database
-import fr.jussieu.daos.config.ConfigSQL
+import daos.config.ConfigSQL
 
 object DBAccess {
 

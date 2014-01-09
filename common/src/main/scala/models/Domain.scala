@@ -1,4 +1,4 @@
-package fr.jussieu.models
+package models
 
 case class User(id: Long, userProviderId: String)
 

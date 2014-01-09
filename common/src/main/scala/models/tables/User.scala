@@ -1,4 +1,4 @@
-package fr.jussieu.models.tables
+package models.tables
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._

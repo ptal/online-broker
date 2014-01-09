@@ -1,4 +1,4 @@
-package fr.jussieu.models
+package models
 
 
 //FIXME: If we don't use it in the end remove it

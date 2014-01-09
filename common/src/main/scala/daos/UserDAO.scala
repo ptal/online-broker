@@ -1,11 +1,11 @@
-package fr.jussieu.daos
+package daos
 
 import java.sql.{Time, Date}
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import fr.jussieu.models.{UserAggregatedView, User}
+import models.{UserAggregatedView, User}
 
 object UserTable extends Table[(Long, String)]("Users") {
 

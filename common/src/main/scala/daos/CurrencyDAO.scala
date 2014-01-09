@@ -1,4 +1,4 @@
-package fr.jussieu.daos
+package daos
 
 import java.sql.{Timestamp, Date}
 

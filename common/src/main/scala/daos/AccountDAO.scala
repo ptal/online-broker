@@ -1,9 +1,9 @@
-package fr.jussieu.daos
+package daos
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import fr.jussieu.models.Account
+import models.Account
 
 
 object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {
