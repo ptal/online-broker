@@ -18,7 +18,7 @@ object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
 
   def * = id.? ~ rate ~ currency ~ event <> (ExchangeRate, ExchangeRate.unapply _)
 
-  def currencyFK = foreignKey("TR_CURRENCY_FK", currency, Currencies)(_.id)
+  def currencyFK = foreignKey("EXCHANGERATE_CURRENCY_FK", currency, Currencies)(_.id)
   def eventFK = foreignKey("TR_EVENT_FK", event, ExchangeRatesEvents)(_.id)
   def uniqueEventCurrency = index("UNIQUE_EVENT_CURRENCY", (currency, event), unique = true)
   def autoInc = rate ~ currency ~ event returning id
