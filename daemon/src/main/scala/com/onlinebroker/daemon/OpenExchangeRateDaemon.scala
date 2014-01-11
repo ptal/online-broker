@@ -14,12 +14,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
-import org.joda.time.DateTime
-import java.sql.Timestamp
+import java.sql.Date
 
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
-import com.onlinebroker.daos.{DBAccess, DBUpdate, CurrencyDAO}
+import com.onlinebroker.models.tables._
+import com.onlinebroker.models._
 
 
 trait Config {
@@ -46,18 +46,17 @@ object CurrenciesInitializer extends Config {
     names.fields.map(name =>
       (name._1, name._2.as[JsString].value))
   }
-  private def initExchangeRates(rates: JsValue, names: JsValue) = {
+
+  private def initExchangeRates(names: JsValue) = {
     for(name <- retrieveNames(names)) {
-      CurrencyDAO.addCurrency(name._1, name._2)
+      Currency.insert(name._1, name._2)
     }
   }
 
   def init() = {
-    makeJsonRequest(latestRateURL, jrates =>
-      makeJsonRequest(currenciesNamesURL, jnames => {
-        initExchangeRates(jrates, jnames)
-      })
-    )
+    makeJsonRequest(currenciesNamesURL, jnames => {
+      initExchangeRates(jnames)
+    })
   }
 }
 
@@ -71,30 +70,71 @@ object ExchangeRatesUpdater extends Config {
       (rate._1, rate._2.as[JsNumber].as[Double]))
   }
 
-  private def updateRates(dbUpdate: Long)(rates: JsValue) = {
-    retrieveRates(rates).foreach{ rate =>
-      val res = CurrencyDAO.updateRate(rate._1, rate._2, dbUpdate)
-      if(res.isFailure) {
-        println(s"Result: $res")
+  private def insertRates(rates: Seq[(String, Double)], eventID: Long)
+    (implicit s: Session): Option[OnlineBrokerError] =
+  {
+    if(!rates.isEmpty) {
+      Currencies.findByAcronymName(rates.head._1) match {
+        case -\/(e) => Some(e)
+        case \/-(currency) => {
+          ExchangeRates.insert(ExchangeRate(None, rates.head._2, currency, eventID))
+          insertRates(rates.tail, eventID)
+        }
       }
+    }
+    else None
+  }
+
+  private def insertRates(rates: JsValue, eventID: Long)
+    (implicit s: Session): Option[OnlineBrokerError] =
+  {
+    insertRates(retrieveRates(rates), eventID)
+  }
+
+  private def baseCurrency(rates: JsValue)(implicit s: Session): \/[OnlineBrokerError, Long] = {
+    val base = (jrates \ "base").as[JsString].value
+    Currencies.findByAcronymName(base) match {
+      case -\/(e) => -\/(e)
+      case \/-(currency) => \/-(currency.id)
     }
   }
 
-  // We need a lock telling when the database is initialized because init()
-  // uses asynchronous operation that can complete after the return.
-  // A more elegant solution might be to use something like Future[Void].
+  private def ratesDate(rates: JsValue)(implicit s: Session): Date = {
+    val timestamp = (jrates \ "timestamp").as[JsNumber].value.toLong * 1000
+    Date(timestamp)
+  }
 
+  private def makeExchangeRatesEvent(rates: JsValue) = {
+    DBAccess.db.withSession { implicit session : Session => {
+    session.withTransaction {
+      baseCurrency(rates) match {
+        case -\/(e) => Some(e)
+        case \/-(baseID) => {
+          // Insert the special event "exchange rates".
+          val eventID = ExchangeRatesEvents.insert(ExchangeRatesEvent(None, baseID))
+          ExchangeRatesEvents.eventType match {
+            case -\/(e) => Some(e)
+            case \/-(eventType) => {
+              // Insert a generic event referencing the exchange rates one's.
+              GameEvents.insert(GameEvent(None, ratesDate(rates), eventType, eventID))
+              // Insert the rates
+              insertRates(rates, eventID)
+            }
+          }
+        }
+      } match {
+        Some(e) => {
+          session.rollback
+          Logger.error("[ExchangeRates daemon] Could not update the database (" + e.description + ")")
+        }
+        None => Logger.info("[ExchangeRates daemon] Database updated.")
+      }
+    }}
+  }
 
   def start() = {
     running(FakeApplication()) {
-      DBAccess.db.withSession { session : Session =>
-        val dbUpdate = DBUpdate.add(new java.sql.Timestamp(DateTime.now().getMillis))(session)
-        Await.result(makeJsonRequest(latestRateURL, updateRates(dbUpdate)), DurationInt(20).seconds)
-        Logger.info("[ExchangeRates daemon] Database updated.")
-      }
-
-
+        Await.result(makeJsonRequest(latestRateURL, makeExchangeRatesEvent), DurationInt(20).seconds)
     }
   }
-
 }

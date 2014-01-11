@@ -7,6 +7,7 @@ import scala.slick.driver.MySQLDriver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
+import com.onlinebroker.models.SQLDatabase._
 import com.onlinebroker.models.tables._
 
 object Daemon extends App {
@@ -25,11 +26,14 @@ object InitDB extends App {
 
     tables.create
 
-    // TODO :
-    // * Modify the currency initializer.
-    // * Initialize the GameEventsType table with the eventName value from the *Event classes.
-    // * Initialize the Providers table with the supported providers (only github ATM).
+    // Initialize the event types table.
+    GameEventsType.insert(GameEventType(None, ExchangeRatesEvents.eventName))
+    GameEventsType.insert(GameEventType(None, TransferGameEvents.eventName))
 
+    // Initialize the Provider table with supported providers.
+    Providers.insert(Provider(None, securesocial.core.providers.GitHubProvider.GitHub))
+
+    // First initialization of the exchange rates.
     CurrenciesInitializer.init()
     ExchangeRatesUpdater.start()
   }
