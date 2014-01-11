@@ -5,7 +5,7 @@ import scala.slick.driver.MySQLDriver.simple._
 
 import com.onlinebroker.models.GameEventType
 
-object GameEventType extends Table[GameEventType]("GameEventsType") {
+object GameEventsType extends Table[GameEventType]("GameEventsType") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def name = column[Long]("name")
@@ -16,4 +16,12 @@ object GameEventType extends Table[GameEventType]("GameEventsType") {
 
   def insert(gameEventType: GameEventType)(implicit s: Session) : Long = 
     autoInc.insert(gameEventType.name)
+
+  def findByName(eventName: String)(implicit s: Session): \/[OnlineBrokerError, GameEventType] =
+    Query(GameEventsType)
+      .filter(_.name === eventName)
+      .firstOption match {
+        None => -\/(InternalServerError("GameEventsType.findByName: Database not initialized with the event type (" + eventName + ")"))
+        Some(gameEventType) => \/-(gameEventType)
+      }
 }
