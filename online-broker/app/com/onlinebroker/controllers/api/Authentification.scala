@@ -53,9 +53,10 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
 
   private var tokens = Map[String, Token]()
 
+  // FIX: Use the table.Users table.
   def find(id: IdentityId): Option[Identity] = {
     UserDAO.findByGithubUserId(id.userId).map{ user =>
-      SocialUser(id, user.userProviderId, "", user.userProviderId,None, None, AuthenticationMethod.OAuth2, None,None, None)
+      SocialUser(id, user.githubUserId , "", user.githubUserId, None, None, AuthenticationMethod.OAuth2, None,None, None)
     }
   }
 
@@ -63,6 +64,7 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
     ???
   }
 
+  // FIX: Use the table.Users table.
   def save(user: Identity): Identity = {
     val INITIAL_MONEY = 300000
     DBAccess.db.withSession{ implicit session : Session  =>

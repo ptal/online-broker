@@ -12,7 +12,7 @@ object Providers extends Table[Provider]("Providers") {
 
   def * = id.? ~ name <> (Provider, Provider.unapply _)
 
-  def uniqueProdiverName = index("UNIQUE_PROVIDER_NAME", name, unique = true)
+  def uniqueProviderName = index("UNIQUE_PROVIDER_NAME", name, unique = true)
   def autoInc = name returning id
 
   def insert(provider: Provider)(implicit s: Session): Long = 

@@ -126,5 +126,4 @@ object CurrencyDAO {
       })
     }
   }
-
 }
