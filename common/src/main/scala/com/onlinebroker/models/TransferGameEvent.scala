@@ -37,13 +37,23 @@ object TransferGameEvent
         error => -\/(error),
         { case (accountOwner, ratedAmount) =>
           session.withTransaction {
-            val res = for(fromTransfer <- Accounts.transfer(accountOwner, -ratedAmount, fromCurrencyAcronym);
-                        toTransfer <- Accounts.transfer(accountOwner, ratedAmount, toCurrencyAcronym))
-            yield { AccountAfterTransfer(fromTransfer, toTransfer) }
-            // If the transfer was impossible with one account, we rollback the transaction.
-            if(res.isLeft)
-              session.rollback
-            res
+            val res = for{
+              fromAccount <- Accounts.transfer(accountOwner, -ratedAmount, fromCurrencyAcronym)
+              toAccount <- Accounts.transfer(accountOwner, ratedAmount, toCurrencyAcronym)}
+            yield { (fromAccount, toAccount) }
+            res match {
+              // If the transfer was impossible with one account, we rollback the transaction.
+              case -\/(e) => {
+                session.rollback
+                -\/(e)
+              }
+              // Otherwise we add it in the historic.
+              case \/-((fromAccount, toAccount)) => {
+                TransferGameEvents.insert(
+                  TransferGameEvent(None, accountOwner, fromAccount.id.get, toAccount.id.get, ratedAmount))
+                \/-(AccountAfterTransfer(fromAccount.amount, toAccount.amount))
+              }
+            }
           }
         }
       )

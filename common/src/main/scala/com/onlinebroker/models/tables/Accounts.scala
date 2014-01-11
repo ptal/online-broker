@@ -27,7 +27,7 @@ object Accounts extends Table[Account]("Accounts") {
     autoInc.insert(account.owner, account.currency, account.amount)
 
   def transfer(accountOwner: User, transferAmount: Double, currencyAcronym: String)
-    (implicit s: Session): \/[OnlineBrokerError, Double] =
+    (implicit s: Session): \/[OnlineBrokerError, Account] =
   {
     // One request to retrieve the account should be enough.
     Currencies.findByAcronym(currencyAcronym) match {
@@ -44,9 +44,10 @@ object Accounts extends Table[Account]("Accounts") {
               -\/(NegativeAccountNotAllowed())
             else
             {
-              val myAccount = for (a <- Accounts if a.id === account.id.get) yield amount
+              val myAccount = for (a <- Accounts if a.id === account.id.get) yield a
+              // FIXME
               myAccount.update(newAmount)
-              \/-(newAmount)
+              \/-(myAccount)
             }
           }
         }

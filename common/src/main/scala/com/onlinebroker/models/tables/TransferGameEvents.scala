@@ -26,8 +26,5 @@ object TransferGameEvents extends Table[TransferGameEvent]("TransferGameEvents")
   def autoInc = owner ~ fromAccount ~ toAccount ~ amount returning id
 
   def insert(transfer: TransferGameEvent)(implicit s: Session) : Long = 
-    autoInc.insert((transfer.owner, transfer.fromAccount,transfer.toAccount, transfer.amount))
-
-  def insert(owner: Long, from: Long, to: Long, amount: Double)(implicit s: Session) : Long =
-    autoInc.insert((owner, from, to, amount))
+    autoInc.insert((transfer.owner, transfer.fromAccount, transfer.toAccount, transfer.amount))
 }
