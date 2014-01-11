@@ -3,16 +3,16 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
 
 object GameEventsType extends Table[GameEventType]("GameEventsType") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def name = column[Long]("name")
+  def name = column[String]("name")
 
-  def * = id.? ~ name <> (GameEventType, GameEventType.unapply _)
+  def * = id.? ~ name <> (GameEventType.apply _, GameEventType.unapply _)
 
   def autoInc = name returning id
 
@@ -24,6 +24,6 @@ object GameEventsType extends Table[GameEventType]("GameEventsType") {
       .filter(_.name === eventName)
       .firstOption match {
         case None => -\/(InternalServerError("GameEventsType.findByName: Database not initialized with the event type (" + eventName + ")"))
-        case Some(gameEventType) => \/-(gameEventType)
+        case Some(gameEventType: GameEventType) => \/-(gameEventType)
       }
 }

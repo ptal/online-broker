@@ -2,7 +2,7 @@ package com.onlinebroker.models
 
 case class User(
   id: Option[Long],
-  providerId: Long,
+  providerId: String,
   providerUserId: String,
   email: Option[String],
   firstName: String,

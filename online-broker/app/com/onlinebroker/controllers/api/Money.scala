@@ -10,6 +10,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
 import com.onlinebroker.models._
+import com.onlinebroker.models.tables.{ExchangeRates, Currencies}
 
 
 object Money extends Controller {
@@ -24,7 +25,7 @@ object Money extends Controller {
   }
 
   def listCurrenciesNames = Action {
-    Ok(CurrencyDAO.nameOfAllCurrencies().foldLeft(new JsArray){
+    Ok(Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
       case (jarray, (acronym, name)) =>
         jarray :+ new JsObject(List((acronym, new JsString(name))))
     })
@@ -32,7 +33,7 @@ object Money extends Controller {
 
   def updateCurrencies = Action { request =>
     implicit val writer = Json.writes[ExchangeRate]
-    channel.push(Json.toJson(CurrencyDAO.getAllCurrencies).toString())
+    channel.push(Json.toJson(ExchangeRates.getLastExchangeRates()).toString())
     Ok("Updated Currencies.")
   }
 
@@ -48,24 +49,25 @@ object Money extends Controller {
     implicit val writer = Json.writes[ExchangeRate]
     Ok(Json.obj(
       "status" -> "OK",
-      "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies.sortBy(_.name))
+      "currencies" -> Json.toJson(ExchangeRates.getLastExchangeRates())
     ))
 
   }
 
   def transfer = Action(parse.json) { request =>
     implicit val transferReads = (
+      (__ \ "providerId").read[String] and
       (__ \ "userId").read[String] and
       (__ \ "amount").read[Double] and
       (__ \ "currencyFrom").read[String] and
       (__ \ "currencyTo").read[String]
       tupled
     )
-    request.body.validate[(String, Double, String, String)].fold(
-      valid = { case (userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
+    request.body.validate[(String, String, Double, String, String)].fold(
+      valid = { case (providerId, userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
         val transfer = for {
-          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, userID)
-        } yield {Ok(makeTransferResponse(ratedAmount))}
+          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, AuthenticationUserInfo(providerName=userID, providerUserId = userID))
+        } yield {Ok(makeTransferResponse(amount))}
         transfer.getOrElse(
           BadRequest(
             Json.obj(

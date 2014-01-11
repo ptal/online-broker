@@ -28,21 +28,25 @@ object TransferGameEvent
     amount: Double, userInfo: AuthenticationUserInfo): \/[OnlineBrokerError, AccountAfterTransfer] = {
     DBAccess.db withSession { implicit session =>
       // We retrieve twice the currency, should be improved.
-      for(accountOwner <- Users.findByInfo(userInfo);
-          fromRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(fromCurrencyAcronym);
-          toRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(toCurrencyAcronym);
-          ratedAmount = computeRatedAmount(fromRate.rate, toRate.rate, amount))
-      yield {
-        session.withTransaction {
-          res = for(fromTransfer <- Accounts.transfer(accountOwner, -ratedAmount, fromCurrencyAcronym);
-                    toTransfer <- Accounts.transfer(accountOwner, ratedAmount, toCurrencyAcronym))
-          yield { /\-(AccountAfterTransfer(fromTransfer, toTransfer)) }
-          // If the transfer was impossible with one account, we rollback the transaction.
-          if(res.isLeft)
-            session.rollback
-          res
+      val res = for{
+          accountOwner <- Users.findByInfo(userInfo)
+          fromRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(fromCurrencyAcronym)
+          toRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(toCurrencyAcronym)
+      } yield { (accountOwner, computeRatedAmount(fromRate.rate, toRate.rate, amount)) }
+      res.fold(
+        error => -\/(error),
+        { case (accountOwner, ratedAmount) =>
+          session.withTransaction {
+            val res = for(fromTransfer <- Accounts.transfer(accountOwner, -ratedAmount, fromCurrencyAcronym);
+                        toTransfer <- Accounts.transfer(accountOwner, ratedAmount, toCurrencyAcronym))
+            yield { AccountAfterTransfer(fromTransfer, toTransfer) }
+            // If the transfer was impossible with one account, we rollback the transaction.
+            if(res.isLeft)
+              session.rollback
+            res
+          }
         }
-      }
+      )
     }
   }
 }

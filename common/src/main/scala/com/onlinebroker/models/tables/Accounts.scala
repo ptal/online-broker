@@ -3,7 +3,7 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
 
@@ -30,9 +30,9 @@ object Accounts extends Table[Account]("Accounts") {
     (implicit s: Session): \/[OnlineBrokerError, Double] =
   {
     // One request to retrieve the account should be enough.
-    Currency.findByAcronym(currencyAcronym) match {
+    Currencies.findByAcronym(currencyAcronym) match {
       case -\/(error) => -\/(error)
-      case \/-(currency) => {
+      case \/-(currency:Currency) => {
         Query(Accounts)
         .filter(_.owner === accountOwner.id)
         .filter(_.currency === currency.id)

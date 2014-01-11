@@ -3,9 +3,11 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
+import scalaz.std.either._
 
 import com.onlinebroker.models._
+import com.onlinebroker.models.SQLDatabase.DBAccess
 
 object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
 
@@ -37,11 +39,40 @@ object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
     queryByEvent(exchangeRatesEvent).list
   }
 
+  def getLastExchangeRates() : List[ExchangeRate] =
+  {
+    DBAccess.db.withSession{ implicit session =>
+      val max = Query(ExchangeRates).map(_.event).max
+      val q = for {
+        currency <- Currencies
+        exchangeRate <- ExchangeRates if exchangeRate.currency === currency.id && exchangeRate.event === max
+      } yield { exchangeRate }
+      q.list()
+    }
+
+  }
+
+  def getLastExchangeRateFor(acronym: String) : \/[OnlineBrokerError, ExchangeRate] =
+  {
+    DBAccess.db.withSession{ implicit session =>
+      val max = Query(ExchangeRates).map(_.event).max
+      val q = for {
+        currency <- Currencies if currency.acronym === acronym
+        exchangeRate <- ExchangeRates if exchangeRate.currency === currency.id && exchangeRate.event === max
+      } yield { exchangeRate }
+      q.firstOption.toRight(BadCurrencyAcronym(acronym)).fold(
+        error => -\/(error),
+        success => \/-(success)
+      )
+    }
+
+  }
+
   def findExchangeRate(exchangeRatesEvent: ExchangeRatesEvent, currency: Long)
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
   {
     queryByEvent(exchangeRatesEvent)
-    .filter(_.currency = currency)
+    .filter(_.currency === currency)
     .firstOption match {
       case None => -\/(InternalServerError("ExchangeRates.findExchangeRate: No exchange rate for this event and currency found."))
       case Some(exchangeRate) => \/-(exchangeRate)

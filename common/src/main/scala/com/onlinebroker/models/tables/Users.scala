@@ -7,11 +7,12 @@ import scalaz.{\/, -\/, \/-, ValidationNel}
 import scalaz.syntax.validation._
 
 import com.onlinebroker.models._
+import com.onlinebroker.models.SQLDatabase.DBAccess
 
 object Users extends Table[User]("Users") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def providerId = column[Long]("providerId")
+  def providerId = column[String]("providerId")
   def providerUserId = column[String]("providerUserId")
   def email = column[Option[String]]("email")
   def firstName = column[String]("firstName")
@@ -47,13 +48,15 @@ object Users extends Table[User]("Users") {
       }
   }
 
-  def findByProviderInfo
-    (userInfo: AuthenticationUserInfo)
-    (implicit s: Session): \/[OnlineBrokerError, User] =
+  def findByInfo
+    (userInfo: AuthenticationUserInfo) : \/[OnlineBrokerError, User] =
   {
-    Providers.findByName(userInfo.providerName) match {
-      case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))
-      case Some(provider) => findByProviderInfo(provider, userInfo.providerUserId)
+    DBAccess.db.withSession { implicit session =>
+      Providers.findByName(userInfo.providerName) match {
+        case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))
+        case Some(provider) => findByProviderInfo(provider, userInfo.providerUserId)
+      }
     }
+
   }
 }

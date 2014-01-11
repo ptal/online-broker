@@ -5,7 +5,7 @@ import scala.slick.driver.MySQLDriver.simple._
 
 import java.sql.Date
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
 
@@ -20,8 +20,7 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
   def owningUserFK = foreignKey("TR_GAMEEVENTSTYPE_FK", owner, Users)(_.id)
   def eventTypeFK = foreignKey("TR_GAMEEVENTS_EVENTTYPE_FK", eventType, GameEventsType)(_.id)
 
-  def * = id.? ~ owner ~ creationDate ~ eventType ~ event
-   <> (GameEvent, GameEvent.unapply _)
+  def * = id.? ~ owner ~ creationDate ~ eventType ~ event <> (GameEvent.apply _, GameEvent.unapply _)
 
   def autoInc = owner ~ creationDate ~ eventType ~ event returning id
 
@@ -30,15 +29,18 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
       gameEvent.eventType, gameEvent.event)
 
   def findLastEventByName(eventName: String)(implicit s: Session): \/[OnlineBrokerError, GameEvent] = {
-    for(eventType <- GameEventsType.findByName(eventName))
+    val res = for(eventType <- GameEventsType.findByName(eventName))
     yield {
-      Query(GameEvents)
-      .filter(_.eventType === eventType.id.get)
-      .sortBy(_.creationDate.desc)
-      .firstOption match {
-        case None => -\/(NotYetSuchEvent(eventName))
-        case Some(gameEvent) => \/-(gameEvent)
-      }
-  }
+      eventType
+    }
+    res.flatMap{ gameEventType =>
+        Query(GameEvents)
+          .filter(_.eventType === eventType)
+          .sortBy(_.creationDate.desc)
+          .firstOption match {
+          case None => -\/(NotYetSuchEvent(eventName))
+          case Some(gameEvent: GameEvent) => \/-(gameEvent)
+        }
+    }
   }
 }

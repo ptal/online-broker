@@ -1,6 +1,6 @@
 package com.onlinebroker.models
 
 case class Provider(
-  id: Option[Long],
+  id: String,
   name: String
 )

@@ -3,9 +3,10 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
+import com.onlinebroker.models.SQLDatabase.DBAccess
 
 object Currencies extends Table[Currency]("Currencies") {
 
@@ -19,7 +20,7 @@ object Currencies extends Table[Currency]("Currencies") {
   def autoInc = acronym ~ fullName returning id
 
   def insert(currency: Currency)(implicit s: Session) : Long = 
-    autoInc.insert(currency.acronym, currency.fullName)
+    autoInc.insert((currency.acronym, currency.name))
 
   def findByAcronym(currencyAcronym: String)
     (implicit s: Session): \/[OnlineBrokerError, Currency] =
@@ -31,4 +32,14 @@ object Currencies extends Table[Currency]("Currencies") {
       case Some(currency) => \/-(currency)
     }
   }
+
+  def nameOfAllCurrencies() : List[(String, String)] =
+  {
+    DBAccess.db.withSession{ implicit session =>
+      val q = for { currency <- Currencies } yield { (currency.acronym, currency.fullName) }
+      q.list()
+    }
+
+  }
+
 }

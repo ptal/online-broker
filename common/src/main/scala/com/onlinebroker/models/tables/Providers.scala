@@ -7,18 +7,17 @@ import com.onlinebroker.models._
 
 object Providers extends Table[Provider]("Providers") {
 
-  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  // The id is predefined, it can't be assigned for us unless we want to
+  // have our own internal id and the official id
+  def id = column[String]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
 
-  def * = id.? ~ name <> (Provider, Provider.unapply _)
+  def * = id ~ name <> (Provider, Provider.unapply _)
 
   def uniqueProviderName = index("UNIQUE_PROVIDER_NAME", name, unique = true)
   def autoInc = name returning id
 
-  def insert(provider: Provider)(implicit s: Session): Long = 
-    autoInc.insert(provider.name)
-
-  def findByID(providerID: Long)(implicit s: Session): Option[Provider] =
+  def findByID(providerID: String)(implicit s: Session): Option[Provider] =
     Query(Providers)
     .filter(_.id === providerID)
     .firstOption

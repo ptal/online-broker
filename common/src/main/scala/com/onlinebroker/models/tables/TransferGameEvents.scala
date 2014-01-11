@@ -17,7 +17,7 @@ object TransferGameEvents extends Table[TransferGameEvent]("TransferGameEvents")
   def toAccount = column[Long]("toAccount")
   def amount = column[Double]("amount")
 
-  def * = id.? ~ owner ~ fromAccount ~ toAccount ~ amount <> (TransferGameEvent, TransferGameEvent.unapply _)
+  def * = id.? ~ owner ~ fromAccount ~ toAccount ~ amount <> (TransferGameEvent.apply _, TransferGameEvent.unapply _)
 
   def fromAccountFK = foreignKey("TR_FROMACCOUNT_FK", fromAccount, Accounts)(_.id)
   def toAccountFK = foreignKey("TR_TOACCOUNT_FK", toAccount, Accounts)(_.id)
@@ -27,4 +27,7 @@ object TransferGameEvents extends Table[TransferGameEvent]("TransferGameEvents")
 
   def insert(transfer: TransferGameEvent)(implicit s: Session) : Long = 
     autoInc.insert((transfer.owner, transfer.fromAccount,transfer.toAccount, transfer.amount))
+
+  def insert(owner: Long, from: Long, to: Long, amount: Double)(implicit s: Session) : Long =
+    autoInc.insert((owner, from, to, amount))
 }
