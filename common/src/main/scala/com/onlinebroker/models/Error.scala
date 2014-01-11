@@ -24,3 +24,23 @@ case class UserNotRegistered(providerID: String) extends OnlineBrokerError {
   def name = "user-not-registered"
   def description = "You can't sign in if you are not registered."
 }
+
+case class NotYetSuchEvent(eventName: String) extends OnlineBrokerError {
+  def name = "not-yet-such-event"
+  def description = "Event " + eventName + " has not yet occur."
+}
+
+case class BadCurrencyAcronym(acronym: String) extends OnlineBrokerError {
+  def name = "bad-currency-acronym"
+  def description = "Currency acronym " + acronym + " does not exist in our database."
+}
+
+case class TransferWithClosedAccount() extends OnlineBrokerError {
+  def name = "transfer-with-closed-account"
+  def description = "You tried to transfer money on an account that you didn't open."
+}
+
+case class NegativeAccountNotAllowed() extends OnlineBrokerError {
+  def name = "negative-account-not-allowed"
+  def description = "You tried to transfer money without having the money to do so."
+}
