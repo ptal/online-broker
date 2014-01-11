@@ -9,8 +9,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
-import com.onlinebroker.models.Transfer
-import com.onlinebroker.daos.{CurrencyDAO, ExchangeRate, AccountDAO}
+import com.onlinebroker.models.TransferGameEvent
 
 
 object Money extends Controller {
@@ -65,7 +64,7 @@ object Money extends Controller {
     request.body.validate[(String, Double, String, String)].fold(
       valid = { case (userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
         val transfer = for {
-          ratedAmount <- AccountDAO.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, userID)
+          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, userID)
         } yield {Ok(makeTransferResponse(ratedAmount))}
         transfer.getOrElse(
           BadRequest(
