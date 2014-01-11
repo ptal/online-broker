@@ -12,12 +12,13 @@ import scala.concurrent._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import scalaz.{\/,\/-,-\/}
+
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 import java.sql.Date
 
-// Use the implicit threadLocalSession
-import Database.threadLocalSession
+import com.onlinebroker.models.SQLDatabase._
 import com.onlinebroker.models.tables._
 import com.onlinebroker.models._
 
@@ -49,7 +50,7 @@ object CurrenciesInitializer extends Config {
 
   private def initExchangeRates(names: JsValue) = {
     for(name <- retrieveNames(names)) {
-      Currency.insert(name._1, name._2)
+      Currency.insert(Currency(None, name._1, name._2))
     }
   }
 
@@ -74,10 +75,10 @@ object ExchangeRatesUpdater extends Config {
     (implicit s: Session): Option[OnlineBrokerError] =
   {
     if(!rates.isEmpty) {
-      Currencies.findByAcronymName(rates.head._1) match {
+      Currencies.findByAcronym(rates.head._1) match {
         case -\/(e) => Some(e)
         case \/-(currency) => {
-          ExchangeRates.insert(ExchangeRate(None, rates.head._2, currency, eventID))
+          ExchangeRates.insert(ExchangeRate(None, rates.head._2, currency.id.get, eventID))
           insertRates(rates.tail, eventID)
         }
       }
@@ -92,22 +93,22 @@ object ExchangeRatesUpdater extends Config {
   }
 
   private def baseCurrency(rates: JsValue)(implicit s: Session): \/[OnlineBrokerError, Long] = {
-    val base = (jrates \ "base").as[JsString].value
-    Currencies.findByAcronymName(base) match {
+    val base = (rates \ "base").as[JsString].value
+    Currencies.findByAcronym(base) match {
       case -\/(e) => -\/(e)
-      case \/-(currency) => \/-(currency.id)
+      case \/-(currency) => \/-(currency.id.get)
     }
   }
 
   private def ratesDate(rates: JsValue)(implicit s: Session): Date = {
-    val timestamp = (jrates \ "timestamp").as[JsNumber].value.toLong * 1000
-    Date(timestamp)
+    val timestamp = (rates \ "timestamp").as[JsNumber].value.toLong * 1000
+    new Date(timestamp)
   }
 
   private def makeExchangeRatesEvent(rates: JsValue) = {
     DBAccess.db.withSession { implicit session : Session => {
     session.withTransaction {
-      baseCurrency(rates) match {
+      val res = baseCurrency(rates) match {
         case -\/(e) => Some(e)
         case \/-(baseID) => {
           // Insert the special event "exchange rates".
@@ -116,20 +117,22 @@ object ExchangeRatesUpdater extends Config {
             case -\/(e) => Some(e)
             case \/-(eventType) => {
               // Insert a generic event referencing the exchange rates one's.
-              GameEvents.insert(GameEvent(None, ratesDate(rates), eventType, eventID))
+              GameEvents.insert(GameEvent(None, ratesDate(rates), eventType.id.get, eventID))
               // Insert the rates
               insertRates(rates, eventID)
+              None
             }
           }
         }
-      } match {
-        Some(e) => {
+      } 
+      res match {
+        case Some(e) => {
           session.rollback
           Logger.error("[ExchangeRates daemon] Could not update the database (" + e.description + ")")
         }
-        None => Logger.info("[ExchangeRates daemon] Database updated.")
+        case None => Logger.info("[ExchangeRates daemon] Database updated.")
       }
-    }}
+    }}}
   }
 
   def start() = {

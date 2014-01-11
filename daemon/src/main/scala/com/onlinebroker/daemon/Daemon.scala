@@ -9,6 +9,7 @@ import Database.threadLocalSession
 
 import com.onlinebroker.models.SQLDatabase._
 import com.onlinebroker.models.tables._
+import com.onlinebroker.models._
 
 object Daemon extends App {
   ExchangeRatesUpdater.start
@@ -24,6 +25,7 @@ object InitDB extends App {
       ++ ExchangeRatesEvents.ddl ++ GameEvents.ddl ++ GameEventsType.ddl
       ++ Providers.ddl ++ TransferGameEvents.ddl ++ Users.ddl)
 
+    tables.drop
     tables.create
 
     // Initialize the event types table.
