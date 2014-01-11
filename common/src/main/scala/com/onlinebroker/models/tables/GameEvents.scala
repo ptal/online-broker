@@ -19,11 +19,24 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
   def eventTypeFK = foreignKey("TR_GAMEEVENTS_EVENTTYPE_FK", eventType, GameEventsType)(_.id)
 
   def * = id.? ~ owner ~ creationDate ~ eventType ~ event
-   <> (GameEventType, GameEventType.unapply _)
+   <> (GameEvent, GameEvent.unapply _)
 
   def autoInc = owner ~ creationDate ~ eventType ~ event returning id
 
   def insert(gameEvent: GameEvent)(implicit s: Session) : Long = 
     autoInc.insert(gameEvent.owner, gameEvent.creationDate, 
       gameEvent.eventType, gameEvent.event)
+
+  def findLastEventByName(eventName: String)(implicit s: Session): \/[OnlineBrokerError, GameEvent] = {
+    for(eventType <- GameEventsType.findByName(eventName))
+    yield {
+      Query(GameEvents)
+      .filter(_.eventType === eventType.id.get)
+      .sortBy(_.creationDate.desc)
+      .firstOption match {
+        case None => -\/(NotYetSuchEvent(eventName))
+        case Some(gameEvent) => \/-(gameEvent)
+      }
+  }
+  }
 }
