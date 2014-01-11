@@ -50,7 +50,7 @@ object TransferGameEvent
               // Otherwise we add it in the historic.
               case \/-((fromAccount, toAccount)) => {
                 TransferGameEvents.insert(
-                  TransferGameEvent(None, accountOwner, fromAccount.id.get, toAccount.id.get, ratedAmount))
+                  TransferGameEvent(None, accountOwner.id.get, fromAccount.id.get, toAccount.id.get, ratedAmount))
                 \/-(AccountAfterTransfer(fromAccount.amount, toAccount.amount))
               }
             }

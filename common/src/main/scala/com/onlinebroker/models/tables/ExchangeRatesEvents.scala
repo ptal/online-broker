@@ -40,13 +40,13 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
     }
   }
 
-  def findLastRateByCurrency(currency: Currency, event: GameEvent)
+  def findLastRateByCurrency(currency: Long, event: GameEvent)
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
   {
     // The second query should never fails. (acts as a debug assertion).
     for{
       exchangeRatesEvent <- findExchangeRatesEventById(event.event)
-      exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency.id.get)}
+      exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency)}
     yield {
       exchangeRate
     }
@@ -57,7 +57,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   {
     for{event <- GameEvents.findLastEventByName(eventName)
         currency <- Currencies.findByAcronym(currencyAcronym)
-        rate <- findLastRateByCurrency(currency, event)}
+        rate <- findLastRateByCurrency(currency.id.get, event)}
     yield {
       rate
     }
@@ -66,9 +66,11 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   def findAllLastExchangeRates
     (implicit s: Session): \/[OnlineBrokerError, List[ExchangeRate]] =
   {
+    val currencies = for(currency <- Currencies) yield currency.id
+
     for {
       event <- GameEvents.findLastEventByName(eventName)
-      currency <- Currencies
+      currency <- currencies.list()
       exchangeRate <- findLastRateByCurrency(currency, event)
     } yield { exchangeRate }
   }

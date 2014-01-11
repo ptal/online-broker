@@ -44,10 +44,9 @@ object Accounts extends Table[Account]("Accounts") {
               -\/(NegativeAccountNotAllowed())
             else
             {
-              val myAccount = for (a <- Accounts if a.id === account.id.get) yield a
-              // FIXME
+              val myAccount = for (a <- Accounts if a.id === account.id.get) yield a.amount
               myAccount.update(newAmount)
-              \/-(myAccount)
+              \/-(Query(Accounts).filter(_.id == account.id.get).firstOption.get)
             }
           }
         }
