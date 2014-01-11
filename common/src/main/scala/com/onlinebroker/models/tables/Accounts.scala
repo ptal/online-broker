@@ -4,6 +4,7 @@ import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
 import scalaz.{\/, -\/, \/-}
+import scalaz.std.either._
 
 import com.onlinebroker.models._
 

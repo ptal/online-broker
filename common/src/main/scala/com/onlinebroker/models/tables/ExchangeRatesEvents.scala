@@ -4,6 +4,9 @@ import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
 import scalaz.{\/, -\/, \/-}
+import scalaz.std.either._
+import scalaz.std.list._
+import scalaz.syntax.traverse._
 
 import com.onlinebroker.models._
 
@@ -66,13 +69,14 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   def findAllLastExchangeRates
     (implicit s: Session): \/[OnlineBrokerError, List[ExchangeRate]] =
   {
-    val currencies = for(currency <- Currencies) yield currency.id
-
-    for {
-      event <- GameEvents.findLastEventByName(eventName)
-      currency <- currencies.list()
-      exchangeRate <- findLastRateByCurrency(currency, event)
-    } yield { exchangeRate }
+    val lastEvent = GameEvents.findLastEventByName(eventName)
+    val currencies = for {
+      currency <- Currencies
+    } yield { currency.id }
+    val result = currencies.list().map{ currency =>
+      lastEvent.flatMap{ event => findLastRateByCurrency(currency, event) }
+    }
+    result.sequenceU
   }
 
   def eventType(implicit s: Session): \/[OnlineBrokerError, GameEventType] = {

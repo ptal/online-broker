@@ -33,8 +33,16 @@ object Money extends Controller {
 
   def updateCurrencies = Action { request =>
     implicit val writer = Json.writes[ExchangeRate]
-    channel.push(Json.toJson(ExchangeRatesEvent.findAllExchangeRates()).toString())
-    Ok("Updated Currencies.")
+    ExchangeRatesEvent.findAllLastExchangeRates.fold(
+      error => play.api.mvc.Results.InternalServerError(error.toString),
+      rates => {
+          channel.push(Json.toJson(rates).toString())
+          Ok(Json.obj(
+            "status" -> "OK",
+            "currencies" -> Json.toJson(rates)
+          ))
+      }
+    )
   }
 
   def listCurrenciesWebSocket = WebSocket.using[String] { request =>
@@ -46,11 +54,16 @@ object Money extends Controller {
   }
 
   def listCurrencies = Action {
+    //FIXME: Find the way to serialize the errors as json
     implicit val writer = Json.writes[ExchangeRate]
-    Ok(Json.obj(
-      "status" -> "OK",
-      "currencies" -> Json.toJson(ExchangeRatesEvent.findAllExchangeRates())
-    ))
+    ExchangeRatesEvent.findAllLastExchangeRates.fold(
+      error => InternalServerError(error.toString),
+      rates => Ok(Json.obj(
+        "status" -> "OK",
+        "currencies" -> Json.toJson(rates)
+      ))
+    )
+
 
   }
 
