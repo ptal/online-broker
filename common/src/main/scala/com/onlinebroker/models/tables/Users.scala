@@ -3,8 +3,7 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.{\/, -\/, \/-, ValidationNel}
-import scalaz.syntax.validation._
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
 import com.onlinebroker.models.SQLDatabase.DBAccess
