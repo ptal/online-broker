@@ -3,9 +3,13 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import com.onlinebroker.models.TransferGameEvent
+import scalaz.\/
+
+import com.onlinebroker.models._
 
 object TransferGameEvents extends Table[TransferGameEvent]("TransferGameEvents") {
+
+  val eventName = "TransferGameEvents"
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def owner = column[Long]("owner")

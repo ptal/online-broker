@@ -7,7 +7,7 @@ import scala.slick.driver.MySQLDriver.simple._
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
-import com.onlinebroker.daos._
+import com.onlinebroker.models.tables._
 
 object Daemon extends App {
   ExchangeRatesUpdater.start

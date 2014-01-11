@@ -3,7 +3,7 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import com.onlinebroker.models.Provider
+import com.onlinebroker.models._
 
 object Providers extends Table[Provider]("Providers") {
 
@@ -20,8 +20,8 @@ object Providers extends Table[Provider]("Providers") {
 
   def findByID(providerID: Long)(implicit s: Session): Option[Provider] =
     Query(Providers)
-      .filter(_.id === providerID)
-      .firstOption
+    .filter(_.id === providerID)
+    .firstOption
 
   def findByName(providerName: String)(implicit s: Session): Option[Provider] =
     Query(Providers).filter(_.name === providerName).firstOption

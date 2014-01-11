@@ -22,7 +22,7 @@ import com.onlinebroker.models.MalformedRequest
 import securesocial.core.providers.Token
 import scala.util.Right
 
-import com.onlinebroker.daos.Transfer
+import com.onlinebroker.models._
 
 case class SubscribeData(email: String, password: String)
 

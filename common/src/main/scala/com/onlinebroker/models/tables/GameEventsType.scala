@@ -3,7 +3,9 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import com.onlinebroker.models.GameEventType
+import scalaz.\/
+
+import com.onlinebroker.models._
 
 object GameEventsType extends Table[GameEventType]("GameEventsType") {
 

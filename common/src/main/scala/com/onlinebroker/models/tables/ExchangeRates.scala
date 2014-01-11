@@ -3,7 +3,9 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import com.onlinebroker.models.ExchangeRatesEvent
+import scalaz.\/
+
+import com.onlinebroker.models._
 
 object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
 

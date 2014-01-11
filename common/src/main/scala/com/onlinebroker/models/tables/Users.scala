@@ -7,7 +7,7 @@ import scalaz.\/
 
 import com.onlinebroker.models.User
 
-object Users extends Table[User]("Users2") {
+object Users extends Table[User]("Users") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def providerId = column[Long]("providerId")

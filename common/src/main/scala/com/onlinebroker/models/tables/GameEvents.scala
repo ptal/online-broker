@@ -5,7 +5,9 @@ import scala.slick.driver.MySQLDriver.simple._
 
 import java.sql.Date
 
-import com.onlinebroker.models.GameEvent
+import scalaz.\/
+
+import com.onlinebroker.models._
 
 object GameEvents extends Table[GameEvent]("GameEvents") {
 
