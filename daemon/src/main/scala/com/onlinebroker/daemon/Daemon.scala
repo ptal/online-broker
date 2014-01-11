@@ -31,6 +31,7 @@ object InitDB extends App {
     // Initialize the event types table.
     GameEventsType.insert(GameEventType(None, ExchangeRatesEvents.eventName))
     GameEventsType.insert(GameEventType(None, TransferGameEvents.eventName))
+    GameEventsType.insert(GameEventType(None, OpenAccountEvents.eventName))
 
     // Initialize the Provider table with supported providers.
     Providers.insert(Provider(None, securesocial.core.providers.GitHubProvider.GitHub))
