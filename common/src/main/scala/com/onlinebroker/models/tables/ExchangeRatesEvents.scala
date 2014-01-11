@@ -14,7 +14,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def base = column[Long]("Currency")
 
-  def * = id.? ~ base <> (ExchangeRatesEvent, ExchangeRatesEvent.unapply _)
+  def * = id.? ~ base <> (ExchangeRatesEvent.apply _, ExchangeRatesEvent.unapply _)
 
   def autoInc = base returning id
 
@@ -40,17 +40,37 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
     }
   }
 
-  def findLastRateByCurrencyAcronym(currencyAcronym: String)
+  def findLastRateByCurrency(currency: Currency, event: GameEvent)
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
   {
     // The second query should never fails. (acts as a debug assertion).
-    for(event <- GameEvents.findLastEventByName(eventName);
-        exchangeRatesEvent <- findExchangeRatesEventById(event.event);
-        currency <- Currencies.findByAcronym(currencyAcronym);
-        exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency.id.get))
+    for{
+      exchangeRatesEvent <- findExchangeRatesEventById(event.event)
+      exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency.id.get)}
     yield {
       exchangeRate
     }
+  }
+
+  def findLastRateByCurrencyAcronym(currencyAcronym: String)
+    (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
+  {
+    for{event <- GameEvents.findLastEventByName(eventName)
+        currency <- Currencies.findByAcronym(currencyAcronym)
+        rate <- findLastRateByCurrency(currency, event)}
+    yield {
+      rate
+    }
+  }
+
+  def findAllLastExchangeRates
+    (implicit s: Session): \/[OnlineBrokerError, List[ExchangeRate]] =
+  {
+    for {
+      event <- GameEvents.findLastEventByName(eventName)
+      currency <- Currencies
+      exchangeRate <- findLastRateByCurrency(currency, event)
+    } yield { exchangeRate }
   }
 
   def eventType(implicit s: Session): \/[OnlineBrokerError, GameEventType] = {

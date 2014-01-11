@@ -33,7 +33,7 @@ object Money extends Controller {
 
   def updateCurrencies = Action { request =>
     implicit val writer = Json.writes[ExchangeRate]
-    channel.push(Json.toJson(ExchangeRates.getLastExchangeRates()).toString())
+    channel.push(Json.toJson(ExchangeRatesEvent.findAllExchangeRates()).toString())
     Ok("Updated Currencies.")
   }
 
@@ -49,7 +49,7 @@ object Money extends Controller {
     implicit val writer = Json.writes[ExchangeRate]
     Ok(Json.obj(
       "status" -> "OK",
-      "currencies" -> Json.toJson(ExchangeRates.getLastExchangeRates())
+      "currencies" -> Json.toJson(ExchangeRatesEvent.findAllExchangeRates())
     ))
 
   }
