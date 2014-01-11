@@ -26,7 +26,7 @@ object Money extends Controller {
 
   def listCurrenciesNames = Action {
     Ok(Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
-      case (jarray, (acronym, name)) =>
+      case (jarray, Currency(_, acronym, name)) =>
         jarray :+ new JsObject(List((acronym, new JsString(name))))
     })
   }

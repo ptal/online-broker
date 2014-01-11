@@ -33,10 +33,10 @@ object Currencies extends Table[Currency]("Currencies") {
     }
   }
 
-  def nameOfAllCurrencies() : List[(String, String)] =
+  def nameOfAllCurrencies() : List[Currency] =
   {
     DBAccess.db.withSession{ implicit session =>
-      val q = for { currency <- Currencies } yield { (currency.acronym, currency.fullName) }
+      val q = for { currency <- Currencies } yield { currency }
       q.list()
     }
 
