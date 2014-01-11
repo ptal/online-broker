@@ -19,18 +19,18 @@ object InitDB extends App {
   Logger.info("Initializing the database...")
   // Creation of the tables
   DBAccess.db withSession {
-    val ddl = (Transfer.ddl ++ Currencies.ddl ++ DBUpdate.ddl ++ ExchangeRates.ddl ++ UserTable.ddl)
-    //ddl.drop
-    ddl.create
+    val tables = (Accounts.ddl ++ Currencies.ddl ++ ExchangeRates.ddl 
+      ++ ExchangeRatesEvents.ddl ++ GameEvents.ddl ++ GameEventsType.ddl
+      ++ Providers.ddl ++ TransferGameEvents.ddl ++ Users.ddl)
 
-    //Query(ExchangeRates).delete
-    //Query(Currencies).delete
-    //Query(DBUpdate).delete
-    //Query(UserTable).delete
-    //Query(Transfer).delete
+    tables.create
+
+    // TODO :
+    // * Modify the currency initializer.
+    // * Initialize the GameEventsType table with the eventName value from the *Event classes.
+    // * Initialize the Providers table with the supported providers (only github ATM).
 
     CurrenciesInitializer.init()
     ExchangeRatesUpdater.start()
   }
-
 }
