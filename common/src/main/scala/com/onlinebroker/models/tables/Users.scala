@@ -3,6 +3,8 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
+import scalaz.\/
+
 import com.onlinebroker.models.User
 
 object Users extends Table[User]("Users2") {
@@ -35,24 +37,24 @@ object Users extends Table[User]("Users2") {
 
   private def findByProviderInfo
     (providerInfo: Provider, providerUserId: String)
-    (implicit s: Session): Either[User, OnlineBrokerError] =
+    (implicit s: Session): \/[OnlineBrokerError, User] =
   {
     Query(Users)
       .filter(_.providerId === providerInfo.id)
       .filter(_.providerUserId === providerUserId)
       .firstOption match {
-        case None => Right(UserNotRegistered(providerUserId))
-        case Some(user) => Left(user)
+        case None => -\/(UserNotRegistered(providerUserId))
+        case Some(user) => \/-(user)
       }
   }
 
   def findByProviderInfo
-    (providerName: String, providerUserId: String)
-    (implicit s: Session): Either[User, OnlineBrokerError] =
+    (userInfo: AuthenticationUserInfo)
+    (implicit s: Session): Validation[OnlineBrokerError, User] =
   {
-    Providers.findByName(providerName) match {
-      case None => Right(InternalServerError("Providers.findByName: Incorrect provider name."))
-      case Some(provider) => findByProviderInfo(provider)
+    Providers.findByName(userInfo.providerName) match {
+      case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))
+      case Some(provider) => findByProviderInfo(provider, userInfo.providerUserId)
     }
   }
 }
