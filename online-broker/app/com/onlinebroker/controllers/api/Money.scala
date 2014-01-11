@@ -9,7 +9,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
-import com.onlinebroker.models.TransferGameEvent
+import com.onlinebroker.models._
 
 
 object Money extends Controller {
