@@ -29,8 +29,8 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
       Query(ExchangeRatesEvents)
       .filter(_.id === lastEvent.event)
       .firstOption match {
-        None => -\/(InternalServerError("ExchangeRatesEvents.findExchangeRatesEventById: Event ID retrieved in GameEvents table does not match any entry in this table."))
-        Some(rates) => \/-(rates)
+        case None => -\/(InternalServerError("ExchangeRatesEvents.findExchangeRatesEventById: Event ID retrieved in GameEvents table does not match any entry in this table."))
+        case Some(rates) => \/-(rates)
       }
     }
   }

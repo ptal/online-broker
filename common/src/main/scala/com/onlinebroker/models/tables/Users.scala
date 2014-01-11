@@ -3,9 +3,10 @@ package com.onlinebroker.models.tables
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-, ValidationNel}
+import scalaz.syntax.validation._
 
-import com.onlinebroker.models.User
+import com.onlinebroker.models._
 
 object Users extends Table[User]("Users") {
 
@@ -16,14 +17,12 @@ object Users extends Table[User]("Users") {
   def firstName = column[String]("firstName")
   def lastName = column[String]("lastName")
 
-  def * = id.? ~ providerId ~ providerUserId 
-    ~ email ~ firstName ~ lastName <> (User, User.unapply _)
+  def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName <> (User, User.unapply _)
 
   def uniqueProviderInfo = index("UNIQUE_PROVIDER_INFO", 
     (providerId, providerUserId), unique = true)
 
-  def autoInc = providerId ~ providerUserId 
-    ~ email ~ firstName ~ lastName returning id
+  def autoInc = providerId ~ providerUserId ~ email ~ firstName ~ lastName returning id
 
   /**
    * Inserts a new user in the DB with its id automatically generated.
@@ -50,7 +49,7 @@ object Users extends Table[User]("Users") {
 
   def findByProviderInfo
     (userInfo: AuthenticationUserInfo)
-    (implicit s: Session): Validation[OnlineBrokerError, User] =
+    (implicit s: Session): \/[OnlineBrokerError, User] =
   {
     Providers.findByName(userInfo.providerName) match {
       case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))

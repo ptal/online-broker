@@ -1,6 +1,6 @@
 package com.onlinebroker.models
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models.tables._
 import com.onlinebroker.models.SQLDatabase._
@@ -25,9 +25,8 @@ object TransferGameEvent
   }
 
   def transfer(fromCurrencyAcronym: String, toCurrencyAcronym: String, 
-    amount: Double, userInfo: AuthenticateUserInfo): \/[OnlineBrokerError, AccountAfterTransfer]
-  {
-    DBAccess.db withSession { implicit session: Session =>
+    amount: Double, userInfo: AuthenticationUserInfo): \/[OnlineBrokerError, AccountAfterTransfer] = {
+    DBAccess.db withSession { implicit session =>
       // We retrieve twice the currency, should be improved.
       for(accountOwner <- Users.findByInfo(userInfo);
           fromRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(fromCurrencyAcronym);

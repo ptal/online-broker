@@ -23,7 +23,7 @@ object GameEventsType extends Table[GameEventType]("GameEventsType") {
     Query(GameEventsType)
       .filter(_.name === eventName)
       .firstOption match {
-        None => -\/(InternalServerError("GameEventsType.findByName: Database not initialized with the event type (" + eventName + ")"))
-        Some(gameEventType) => \/-(gameEventType)
+        case None => -\/(InternalServerError("GameEventsType.findByName: Database not initialized with the event type (" + eventName + ")"))
+        case Some(gameEventType) => \/-(gameEventType)
       }
 }
