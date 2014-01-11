@@ -8,3 +8,8 @@ case class User(
   firstName: String,
   lastName: String
 )
+
+case class AuthenticationUserInfo(
+  providerName: String,
+  providerUserId: String
+)
