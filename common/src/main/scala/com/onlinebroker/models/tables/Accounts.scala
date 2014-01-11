@@ -4,6 +4,7 @@ import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
 import scalaz.{\/, -\/, \/-}
+import scalaz.std.either._
 
 import com.onlinebroker.models._
 
@@ -44,10 +45,15 @@ object Accounts extends Table[Account]("Accounts") {
               -\/(NegativeAccountNotAllowed())
             else
             {
-              val myAccount = for (a <- Accounts if a.id === account.id.get) yield a
+
+              val myAccountAmountToUpdate = for (a <- Accounts if a.id === account.id.get) yield a.amount
+              myAccountAmountToUpdate.update(newAmount)
+              val myAccount = for (a <- Accounts if a.id === account.id.get) yield {a}
               // FIXME
-              myAccount.update(newAmount)
-              \/-(myAccount)
+
+              myAccount.firstOption.fold[\/[OnlineBrokerError, Account]](
+                -\/(InternalServerError("Account not found"))
+              )(success => \/-(success))
             }
           }
         }

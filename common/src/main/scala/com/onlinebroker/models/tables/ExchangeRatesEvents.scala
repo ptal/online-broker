@@ -4,6 +4,9 @@ import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
 
 import scalaz.{\/, -\/, \/-}
+import scalaz.std.either._
+import scalaz.std.list._
+import scalaz.syntax.traverse._
 
 import com.onlinebroker.models._
 
@@ -40,13 +43,13 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
     }
   }
 
-  def findLastRateByCurrency(currency: Currency, event: GameEvent)
+  def findLastRateByCurrency(id: Long, event: GameEvent)
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
   {
     // The second query should never fails. (acts as a debug assertion).
     for{
       exchangeRatesEvent <- findExchangeRatesEventById(event.event)
-      exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency.id.get)}
+      exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, id)}
     yield {
       exchangeRate
     }
@@ -57,7 +60,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   {
     for{event <- GameEvents.findLastEventByName(eventName)
         currency <- Currencies.findByAcronym(currencyAcronym)
-        rate <- findLastRateByCurrency(currency, event)}
+        rate <- findLastRateByCurrency(currency.id.get, event)}
     yield {
       rate
     }
@@ -66,11 +69,14 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   def findAllLastExchangeRates
     (implicit s: Session): \/[OnlineBrokerError, List[ExchangeRate]] =
   {
-    for {
-      event <- GameEvents.findLastEventByName(eventName)
+    val lastEvent = GameEvents.findLastEventByName(eventName)
+    val currencies = for {
       currency <- Currencies
-      exchangeRate <- findLastRateByCurrency(currency, event)
-    } yield { exchangeRate }
+    } yield { currency.id }
+    val result = currencies.list().map{ currency =>
+      lastEvent.flatMap{ event => findLastRateByCurrency(currency, event) }
+    }
+    result.sequenceU
   }
 
   def eventType(implicit s: Session): \/[OnlineBrokerError, GameEventType] = {
