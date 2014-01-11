@@ -9,15 +9,15 @@ object Providers extends Table[Provider]("Providers") {
 
   // The id is predefined, it can't be assigned for us unless we want to
   // have our own internal id and the official id
-  def id = column[String]("id", O.PrimaryKey, O.AutoInc)
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def name = column[String]("name")
 
-  def * = id ~ name <> (Provider, Provider.unapply _)
+  def * = id.? ~ name <> (Provider.apply _, Provider.unapply _)
 
   def uniqueProviderName = index("UNIQUE_PROVIDER_NAME", name, unique = true)
   def autoInc = name returning id
 
-  def findByID(providerID: String)(implicit s: Session): Option[Provider] =
+  def findById(providerID: Long)(implicit s: Session): Option[Provider] =
     Query(Providers)
     .filter(_.id === providerID)
     .firstOption

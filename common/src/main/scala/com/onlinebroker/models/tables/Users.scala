@@ -11,7 +11,7 @@ import com.onlinebroker.models.SQLDatabase.DBAccess
 object Users extends Table[User]("Users") {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def providerId = column[String]("providerId")
+  def providerId = column[Long]("providerId")
   def providerUserId = column[String]("providerUserId")
   def email = column[Option[String]]("email")
   def firstName = column[String]("firstName")
@@ -19,6 +19,7 @@ object Users extends Table[User]("Users") {
 
   def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName <> (User, User.unapply _)
 
+  def providerFK = foreignKey("TR_PROVIDER_FK", providerId, Providers)(_.id)
   def uniqueProviderInfo = index("UNIQUE_PROVIDER_INFO", 
     (providerId, providerUserId), unique = true)
 
@@ -47,8 +48,7 @@ object Users extends Table[User]("Users") {
       }
   }
 
-  def findByInfo
-    (userInfo: AuthenticationUserInfo) : \/[OnlineBrokerError, User] =
+  def findByInfo(userInfo: AuthenticationUserInfo) : \/[OnlineBrokerError, User] =
   {
     DBAccess.db.withSession { implicit session =>
       Providers.findByName(userInfo.providerName) match {
@@ -56,6 +56,5 @@ object Users extends Table[User]("Users") {
         case Some(provider) => findByProviderInfo(provider, userInfo.providerUserId)
       }
     }
-
   }
 }

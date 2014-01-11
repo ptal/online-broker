@@ -13,48 +13,17 @@ import securesocial.core._
 import securesocial.core.providers.Token
 import securesocial.core.IdentityId
 
-
 import com.onlinebroker.models._
-import scala.util.Left
-import securesocial.core.IdentityId
-import com.onlinebroker.models.MalformedRequest
-import securesocial.core.providers.Token
-import scala.util.Right
-
-import com.onlinebroker.models._
-import com.onlinebroker.models.tables.{TransferGameEvents, ExchangeRates, Currencies, Users}
+import com.onlinebroker.models.tables._
 import com.onlinebroker.models.SQLDatabase.DBAccess
 import scalaz.\/
 
-case class SubscribeData(email: String, password: String)
-
-/*object Authentication extends Controller {
-
-  def makeSubscribeResponse(idToken: String) =
-    Json.obj(
-      "status" -> "OK",
-      "name" -> "subscribe",
-      "id-token" -> idToken)
-
-  def subscribeData(data: SubscribeData) =
-    com.onlinebroker.models.Authentication.subscribe(data.email, data.password).fold (
-      error => GenericError.makeErrorResponse(error) ,
-      idToken => makeSubscribeResponse(idToken)
-    )
-
-  def subscribe() = Action(parse.json) { request =>
-    implicit val writeSubscription : Reads[SubscribeData] = Json.reads[SubscribeData]
-    request.body.validate[SubscribeData].fold(
-      valid = {res => Ok(subscribeData(res))},
-      invalid = {_ => Ok(GenericError.makeErrorResponse(MalformedRequest()))}
-    )
-  }
-} */
 
 class MySQLUserService(application: Application) extends UserServicePlugin(application) {
 
   case class SecureSocialUser(user: User) extends Identity{
-    def identityId : securesocial.core.IdentityId = IdentityId(userId = user.providerUserId, providerId = user.providerId)
+    def identityId : securesocial.core.IdentityId = IdentityId(userId = user.providerUserId, 
+       providerId = Provider.findNameById(user.providerId).get)
     def firstName  = user.firstName
     def lastName = user.lastName
     def fullName = s"$firstName $lastName"
@@ -69,7 +38,7 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
   def identityToUser(id: Identity) : User = User(
     id = None,
     providerUserId = id.identityId.userId,
-    providerId = id.identityId.providerId,
+    providerId = Provider.findIdByName(id.identityId.providerId).get,
     email = id.email,
     firstName = id.firstName,
     lastName = id.lastName
