@@ -13,5 +13,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"        %% "play-test" % "2.2.1",
   "com.typesafe.play"       %% "play" % "2.2.1",
   "com.typesafe.slick" %% "slick" % "1.0.1",
-  "mysql" % "mysql-connector-java" % "5.1.28"
+  "mysql" % "mysql-connector-java" % "5.1.28",
+  "securesocial" %% "securesocial" % "2.1.2"
 )

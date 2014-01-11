@@ -53,4 +53,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
     }
   }
 
+  def eventType(implicit s: Session): \/[OnlineBrokerError, GameEventType] = {
+    GameEventsType.findByName(eventName)
+  }
 }

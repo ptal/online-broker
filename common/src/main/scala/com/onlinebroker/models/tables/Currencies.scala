@@ -14,7 +14,7 @@ object Currencies extends Table[Currency]("Currencies") {
   def acronym = column[String]("acronym")
   def fullName = column[String]("fullName")
 
-  def * = id.? ~ acronym ~ fullName <> (Currency, Currency.unapply _)
+  def * = id.? ~ acronym ~ fullName <> (Currency.apply _, Currency.unapply _)
 
   def uniqueAcronym = index("UNIQUE_ACRONYM", acronym, unique = true)
   def autoInc = acronym ~ fullName returning id
