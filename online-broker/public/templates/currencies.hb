@@ -12,7 +12,7 @@
     {{#each currencies}}
     <tr>
 
-        <td>{{name}}</td>
+        <td>{{fullName}}</td>
         <td>{{acronym}}</td>
         <td>{{exchangeRate}}</td>
     </tr>

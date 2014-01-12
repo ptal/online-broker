@@ -9,6 +9,12 @@ var app = $.sammy("#main", function() {
     connection.onmessage = function (e) {} ;
   });
 
+  function mergeCurrencies(rates, names) {
+     return _(rates).map( function (rate) {
+        var currencyInfo = _(names).findWhere({ acronym : rate.currency });
+        return { acronym : rate.currency, exchangeRate : rate.rate, fullName : currencyInfo.fullName };
+     });
+  }
   this.get('#/', function(context) {
     /*userInfo :
             accounts :
@@ -23,13 +29,10 @@ var app = $.sammy("#main", function() {
         var currencyRate = _(currencies[0].rates).findWhere({ currency : account.currency });
         return { fullCurrency : currencyInfo, account: account, exchangeRate: currencyRate.rate };
       });
-      var currencies = _(currencies[0].rates).map( function (rate) {
-        var currencyInfo = _(currencyNames[0].currencies).findWhere({ acronym : rate.currency });
-        return { acronym : rate.currency, exchangeRate : rate.rate, fullName : currencyInfo.fullName };
-      });
+
 
       context.render("/assets/templates/accounts.hb", {
-        "currencies": currencies,
+        "currencies": mergeCurrencies(currencies[0].rates, currencyNames[0].currencies),
         "userInfo": { accounts : accounts},
       }).swap();
     });
@@ -43,9 +46,9 @@ var app = $.sammy("#main", function() {
         }).swap();
       };
 
-      $.when($.ajax("/api/currencies")).done(function(currenciesText){
+      $.when($.ajax("/api/currencies"),$.ajax("/api/currencies/names")).done(function(currencies, currencyNames){
         context.render("/assets/templates/currencies.hb", {
-          "currencies": currenciesText.currencies
+          "currencies": mergeCurrencies(currencies[0].rates, currencyNames[0].currencies)
         }).swap();
       });
 
