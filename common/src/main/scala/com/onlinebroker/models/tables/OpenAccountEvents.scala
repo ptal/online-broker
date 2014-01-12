@@ -7,6 +7,8 @@ import scalaz.\/
 
 import com.onlinebroker.models._
 
+/*
+TODO: Leaving the logic of opening accounts for later I'd rather have the rest working before
 object OpenAccountEvents extends Table[OpenAccountEvent]("OpenAccountEvents") {
 
   val eventName = "OpenAccountEvents"
@@ -26,3 +28,4 @@ object OpenAccountEvents extends Table[OpenAccountEvent]("OpenAccountEvents") {
   def insert(open: OpenAccountEvent)(implicit s: Session) : Long = 
     autoInc.insert((open.owner, open.whichAccount, open.paymentMethod))
 }
+*/

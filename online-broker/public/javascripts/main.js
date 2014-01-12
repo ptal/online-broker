@@ -14,6 +14,10 @@ var app = $.sammy("#main", function() {
     $.when($.ajax("/api/user/" + providerName + "/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
       var userInfo = userInfoText[0];
       var currencies = currenciesText[0];
+      userInfo.accounts.map(function(acc) {
+        var currency = _(currencies.currencies).findWhere({ acronym : "USD" });
+        acc.fullCurrency = currency;
+      })
       context.render("/assets/templates/accounts.hb", {
         "currencies": currencies.currencies,
         "userInfo": userInfo,
@@ -53,6 +57,7 @@ function transfer_currencies(context) {
           url: "/api/transfer",
           type: "post",
           data: JSON.stringify({
+            "providerName": providerName,
             "userId": userId,
             "currencyFrom": context.params.currencyFrom,
             "currencyTo": context.params.currencyTo,

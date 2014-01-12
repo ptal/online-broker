@@ -55,7 +55,8 @@ object Users extends Table[User]("Users") {
     DBAccess.db.withSession { implicit session =>
       Providers.findByName(userInfo.providerName) match {
         case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))
-        case Some(provider) => findByProviderInfo(provider, userInfo.providerUserId)
+        case Some(provider) =>
+          findByProviderInfo(provider, userInfo.providerUserId)
       }
     }
   }

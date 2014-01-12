@@ -69,7 +69,7 @@ object Money extends Controller {
 
   def transfer = Action(parse.json) { request =>
     implicit val transferReads = (
-      (__ \ "providerId").read[String] and
+      (__ \ "providerName").read[String] and
       (__ \ "userId").read[String] and
       (__ \ "amount").read[Double] and
       (__ \ "currencyFrom").read[String] and
@@ -77,9 +77,9 @@ object Money extends Controller {
       tupled
     )
     request.body.validate[(String, String, Double, String, String)].fold(
-      valid = { case (providerId, userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
+      valid = { case (providerName, userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
         val transfer = for {
-          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, AuthenticationUserInfo(providerName=userID, providerUserId = userID))
+          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, AuthenticationUserInfo(providerName=providerName, providerUserId = userID))
         } yield {Ok(makeTransferResponse(amount))}
         transfer.getOrElse(
           BadRequest(

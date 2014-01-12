@@ -71,7 +71,11 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
           println(user)
           val userId = Users.insert(identityToUser(user))
           // FIXME: Insert the first amount of money for the user
-          //ExchangeRates.getLastExchangeRateFor("USD").foreach(x => TransferGameEvents.insert(x.currency, 0, , userId)))
+          Currencies.findByAcronym("USD").fold(
+            error => Logger.error(s"Error $error when creating account, can't find currency USD"),
+            currency => Accounts.insert(Account(None, userId, currency.id.get, INITIAL_MONEY))
+          )
+
         },
         (_) => ()
       )

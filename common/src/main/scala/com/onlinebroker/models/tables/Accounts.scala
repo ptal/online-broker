@@ -7,6 +7,7 @@ import scalaz.{\/, -\/, \/-}
 import scalaz.std.either._
 
 import com.onlinebroker.models._
+import com.onlinebroker.models.SQLDatabase.DBAccess
 
 object Accounts extends Table[Account]("Accounts") {
 
@@ -27,7 +28,17 @@ object Accounts extends Table[Account]("Accounts") {
   def insert(account: Account)(implicit s: Session) : Long = 
     autoInc.insert(account.owner, account.currency, account.amount)
 
-  def transfer(accountOwner: User, transferAmount: Double, currencyAcronym: String)
+  def accountsForUser(userId: Long) = {
+    DBAccess.db.withSession { implicit session : Session =>
+      val res = for {
+        account <- Accounts if account.owner === userId
+      } yield(account)
+      res.list()
+    }
+
+  }
+
+  def transfer(accountOwner: Long, transferAmount: Double, currencyAcronym: String)
     (implicit s: Session): \/[OnlineBrokerError, Account] =
   {
     // One request to retrieve the account should be enough.
@@ -35,8 +46,8 @@ object Accounts extends Table[Account]("Accounts") {
       case -\/(error) => -\/(error)
       case \/-(currency:Currency) => {
         Query(Accounts)
-        .filter(_.owner === accountOwner.id)
-        .filter(_.currency === currency.id)
+        .filter(_.owner === accountOwner)
+        .filter(_.currency === currency.id.get)
         .firstOption match {
           case None => -\/(TransferWithClosedAccount())
           case Some(account) => {
@@ -45,9 +56,11 @@ object Accounts extends Table[Account]("Accounts") {
               -\/(NegativeAccountNotAllowed())
             else
             {
-              val myAccount = for (a <- Accounts if a.id === account.id.get) yield a.amount
+              val accountId = account.id.get
+              println(accountId)
+              val myAccount = for (a <- Accounts if a.id === accountId) yield a.amount
               myAccount.update(newAmount)
-              \/-(Query(Accounts).filter(_.id == account.id.get).firstOption.get)
+              \/-(Query(Accounts).filter(_.id === accountId).firstOption.get)
             }
           }
         }

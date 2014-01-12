@@ -38,8 +38,8 @@ object TransferGameEvent
         { case (accountOwner, ratedAmount) =>
           session.withTransaction {
             val res = for{
-              fromAccount <- Accounts.transfer(accountOwner, -ratedAmount, fromCurrencyAcronym)
-              toAccount <- Accounts.transfer(accountOwner, ratedAmount, toCurrencyAcronym)}
+              fromAccount <- Accounts.transfer(accountOwner.id.get, -ratedAmount, fromCurrencyAcronym)
+              toAccount <- Accounts.transfer(accountOwner.id.get, ratedAmount, toCurrencyAcronym)}
             yield { (fromAccount, toAccount) }
             res match {
               // If the transfer was impossible with one account, we rollback the transaction.
