@@ -51,7 +51,9 @@ object AccountDAO {
         (currency, operations.map(_.amount).sum.getOrElse(0.0))
       }
       sumQuery.list.map{ case (currency, total) =>
-        CurrencyDAO.getExchangeRate(currency) map { exchangeRate => Account(exchangeRate.acronym, total, owner, exchangeRate.name, exchangeRate.exchangeRate) }
+        CurrencyDAO.getExchangeRate(currency) map { exchangeRate =>
+          Account(exchangeRate.acronym, total, owner, exchangeRate.name, exchangeRate.exchangeRate)
+        }
       }.flatten
     }
   }

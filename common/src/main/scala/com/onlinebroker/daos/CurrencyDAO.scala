@@ -83,6 +83,19 @@ object CurrencyDAO {
     }
   }
 
+  def getExchangeRateMinusOne(currencyId: Long): Option[ExchangeRate] = {
+    DBAccess.db withSession { implicit session =>
+      val all = for {
+        currencies <- Currencies if currencies.id === currencyId
+        exchangeRates <- ExchangeRates if exchangeRates.currency === currencyId
+      } yield((currencyId, currencies.currencyAcronym, currencies.currencyName, exchangeRates.exchangeRate, exchangeRates.dbUpdate))
+      all.sortBy(_._5.desc).list match{
+        case head :: minusOne :: rest => Some(Function.tupled(ExchangeRate.apply _)(minusOne))
+        case _ => None
+      }
+    }
+  }
+
   def getAllCurrencies: List[ExchangeRate] = {
     DBAccess.db withSession { implicit session : Session =>
       val all = for {

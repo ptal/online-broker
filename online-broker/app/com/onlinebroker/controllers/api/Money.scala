@@ -54,6 +54,15 @@ object Money extends Controller {
 
   }
 
+  def listCurrenciesMinusOne = Action {
+    implicit val writer = Json.writes[ExchangeRate]
+    Ok(Json.obj(
+      "status" -> "OK",
+      "currencies" -> Json.toJson(CurrencyDAO.getAllCurrencies.sortBy(_.name))
+    ))
+
+  }
+
   def transfer = Action(parse.json) { request =>
     implicit val transferReads = (
       (__ \ "userId").read[String] and
