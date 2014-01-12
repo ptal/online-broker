@@ -13,7 +13,7 @@ import com.onlinebroker.models._
 import com.onlinebroker.models.tables.{CurrencyInfo, ExchangeRates, Currencies}
 
 
-object Money extends Controller {
+object Money extends Controller with securesocial.core.SecureSocial {
 
   val (out, channel) = Concurrent.broadcast[String]
 
@@ -53,18 +53,18 @@ object Money extends Controller {
     (in, out)
   }
 
-  def listCurrencies = Action {
+  def listCurrencies = SecuredAction {
     //FIXME: Find the way to serialize the errors as json
     implicit val writer = Json.writes[CurrencyInfo]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
       error => InternalServerError(error.toString),
       rates => Ok(Json.obj(
         "status" -> "OK",
-        "currencies" -> Json.toJson(rates)
+        "currencies" -> JsObject(
+          rates.map(c => (c.acronym, JsString(c.exchangeRate.toString())))
+               .toSeq)
       ))
     )
-
-
   }
 
   def transfer = Action(parse.json) { request =>
