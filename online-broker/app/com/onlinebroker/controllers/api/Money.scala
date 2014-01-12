@@ -24,11 +24,25 @@ object Money extends Controller with securesocial.core.SecureSocial {
     )
   }
 
-  def listCurrenciesNames = Action {
+  def listCurrenciesNames = SecuredAction {
     Ok(Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
       case (jarray, Currency(_, acronym, name)) =>
         jarray :+ new JsObject(List((acronym, new JsString(name))))
     })
+  }
+
+  def listCurrencies = SecuredAction {
+    //FIXME: Find the way to serialize the errors as json
+    implicit val writer = Json.writes[CurrencyInfo]
+    ExchangeRatesEvent.findAllLastExchangeRates.fold(
+      error => InternalServerError(error.toString),
+      rates => Ok(Json.obj(
+        "status" -> "OK",
+        "currencies" -> JsObject(
+          rates.map(c => (c.acronym, JsString(c.exchangeRate.toString())))
+               .toSeq)
+      ))
+    )
   }
 
   def updateCurrencies = Action { request =>
@@ -51,20 +65,6 @@ object Money extends Controller with securesocial.core.SecureSocial {
       println("Disconnected")
     }
     (in, out)
-  }
-
-  def listCurrencies = SecuredAction {
-    //FIXME: Find the way to serialize the errors as json
-    implicit val writer = Json.writes[CurrencyInfo]
-    ExchangeRatesEvent.findAllLastExchangeRates.fold(
-      error => InternalServerError(error.toString),
-      rates => Ok(Json.obj(
-        "status" -> "OK",
-        "currencies" -> JsObject(
-          rates.map(c => (c.acronym, JsString(c.exchangeRate.toString())))
-               .toSeq)
-      ))
-    )
   }
 
   def transfer = Action(parse.json) { request =>
