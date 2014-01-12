@@ -10,6 +10,8 @@ import scalaz.syntax.traverse._
 
 import com.onlinebroker.models._
 
+case class CurrencyInfo(id: Long, acronym: String, name: String, exchangeRate: Double)
+
 object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvents") {
 
   val eventName = "ExchangeRatesEvent"
@@ -24,7 +26,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   def insert(rates: ExchangeRatesEvent)(implicit s: Session): Long = 
     autoInc.insert(rates.base)
 
-  def findExchangeRatesEventById(id: Long)
+  def findExchangeRatesEventById()
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRatesEvent] =
   {
     val res = for {
@@ -48,7 +50,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   {
     // The second query should never fails. (acts as a debug assertion).
     for{
-      exchangeRatesEvent <- findExchangeRatesEventById(event.event)
+      exchangeRatesEvent <- findExchangeRatesEventById()
       exchangeRate <- ExchangeRates.findExchangeRate(exchangeRatesEvent, currency)}
     yield {
       exchangeRate
@@ -67,14 +69,17 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   }
 
   def findAllLastExchangeRates
-    (implicit s: Session): \/[OnlineBrokerError, List[ExchangeRate]] =
+    (implicit s: Session): \/[OnlineBrokerError, List[CurrencyInfo]] =
   {
     val lastEvent = GameEvents.findLastEventByName(eventName)
     val currencies = for {
       currency <- Currencies
-    } yield { currency.id }
-    val result = currencies.list().map{ currency =>
-      lastEvent.flatMap{ event => findLastRateByCurrency(currency, event) }
+    } yield { (currency.id, currency.acronym, currency.fullName) }
+    val result = currencies.list().map{ case (currencyId, currencyAcronym, currencyFullName) =>
+      lastEvent.flatMap{ event => findLastRateByCurrency(currencyId, event).map{ e =>
+          CurrencyInfo(currencyId, currencyAcronym, currencyFullName, exchangeRate = e.rate)
+        }
+      }
     }
     result.sequenceU
   }

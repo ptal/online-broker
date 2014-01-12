@@ -1,4 +1,4 @@
-@(githubUserId: String)
+@(providerUserId: String, providerName: String)
 
 <!DOCTYPE html>
 
@@ -16,7 +16,8 @@
         <script src="@routes.Assets.at("javascripts/sammy.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/sammy.handlebars.js")" type="text/javascript"></script>
         <script type="text/javascript">
-            var userId = "@githubUserId";
+            var userId = "@providerUserId";
+            var providerName = "@providerName";
         </script>
         <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
     </head>

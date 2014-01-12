@@ -10,7 +10,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
 import com.onlinebroker.models._
-import com.onlinebroker.models.tables.{ExchangeRates, Currencies}
+import com.onlinebroker.models.tables.{CurrencyInfo, ExchangeRates, Currencies}
 
 
 object Money extends Controller {
@@ -32,7 +32,7 @@ object Money extends Controller {
   }
 
   def updateCurrencies = Action { request =>
-    implicit val writer = Json.writes[ExchangeRate]
+    implicit val writer = Json.writes[CurrencyInfo]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
       error => play.api.mvc.Results.InternalServerError(error.toString),
       rates => {
@@ -55,7 +55,7 @@ object Money extends Controller {
 
   def listCurrencies = Action {
     //FIXME: Find the way to serialize the errors as json
-    implicit val writer = Json.writes[ExchangeRate]
+    implicit val writer = Json.writes[CurrencyInfo]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
       error => InternalServerError(error.toString),
       rates => Ok(Json.obj(

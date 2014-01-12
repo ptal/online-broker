@@ -41,7 +41,9 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
     providerId = Provider.findIdByName(id.identityId.providerId).get,
     email = id.email,
     firstName = id.firstName,
-    lastName = id.lastName
+    fullName = id.fullName,
+    lastName = id.lastName,
+    avatar = id.avatarUrl
   )
 
   private var tokens = Map[String, Token]()
@@ -66,6 +68,7 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
     DBAccess.db.withSession{ implicit session : Session  =>
       Users.findByInfo(AuthenticationUserInfo(user.identityId.providerId, user.identityId.userId)).fold(
         error => {
+          println(user)
           val userId = Users.insert(identityToUser(user))
           // FIXME: Insert the first amount of money for the user
           //ExchangeRates.getLastExchangeRateFor("USD").foreach(x => TransferGameEvents.insert(x.currency, 0, , userId)))

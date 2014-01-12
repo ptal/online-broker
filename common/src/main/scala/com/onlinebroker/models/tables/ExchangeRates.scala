@@ -26,26 +26,26 @@ object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
   def insert(rate: ExchangeRate)(implicit s: Session): Long = 
     autoInc.insert(rate.rate, rate.currency, rate.event)
 
-  private def queryByEvent(exchangeRatesEvent: ExchangeRatesEvent)
+  private def queryByEvent(exchangeRatesEvent: Long)
     (implicit s: Session) =
   {
     Query(ExchangeRates)
-    .filter(_.event === exchangeRatesEvent.id)
+    .filter(_.event === exchangeRatesEvent)
   }
 
   def findExchangeRatesByEvent(exchangeRatesEvent: ExchangeRatesEvent)
     (implicit s: Session): List[ExchangeRate] =
   {
-    queryByEvent(exchangeRatesEvent).list
+    queryByEvent(exchangeRatesEvent.id.get).list
   }
 
   def findExchangeRate(exchangeRatesEvent: ExchangeRatesEvent, currency: Long)
     (implicit s: Session): \/[OnlineBrokerError, ExchangeRate] =
   {
-    queryByEvent(exchangeRatesEvent)
+    queryByEvent(exchangeRatesEvent.id.get)
     .filter(_.currency === currency)
     .firstOption match {
-      case None => -\/(InternalServerError("ExchangeRates.findExchangeRate: No exchange rate for this event and currency found."))
+      case None => -\/(InternalServerError(s"ExchangeRates.findExchangeRate: No exchange rate for this event ${exchangeRatesEvent.id.get} and currency $currency found."))
       case Some(exchangeRate) => \/-(exchangeRate)
     }
   }

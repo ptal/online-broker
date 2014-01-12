@@ -33,7 +33,7 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
     }
     res.flatMap{ gameEventType =>
         Query(GameEvents)
-          .filter(_.eventType === eventType)
+          .filter(_.eventType === gameEventType.id)
           .sortBy(_.creationDate.desc)
           .firstOption match {
           case None => -\/(NotYetSuchEvent(eventName))

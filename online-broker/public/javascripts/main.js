@@ -11,12 +11,12 @@ var app = $.sammy("#main", function() {
 
   this.get('#/', function(context) {
     // fetch handlebars-partial first
-    $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
+    $.when($.ajax("/api/user/" + providerName + "/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText){
       var userInfo = userInfoText[0];
       var currencies = currenciesText[0];
       context.render("/assets/templates/accounts.hb", {
         "currencies": currencies.currencies,
-        "userInfo": userInfo
+        "userInfo": userInfo,
       }).swap();
     });
   });

@@ -6,7 +6,9 @@ case class User(
   providerUserId: String,
   email: Option[String],
   firstName: String,
-  lastName: String
+  lastName: String,
+  fullName: String,
+  avatar : Option[String]
 )
 
 case class AuthenticationUserInfo(

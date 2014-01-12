@@ -4,6 +4,10 @@ import play.api.Logger
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.ExecutionContext.Implicits.global
+
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
@@ -12,7 +16,9 @@ import com.onlinebroker.models.tables._
 import com.onlinebroker.models._
 
 object Daemon extends App {
-  ExchangeRatesUpdater.start
+
+  ExchangeRatesUpdater.start()
+
 }
 
 object InitDB extends App {
@@ -36,7 +42,10 @@ object InitDB extends App {
     Providers.insert(Provider(None, securesocial.core.providers.GitHubProvider.GitHub))
 
     // First initialization of the exchange rates.
-    CurrenciesInitializer.init()
+    Await.result({
+      CurrenciesInitializer.init()
+    }, DurationInt(30).seconds)
     ExchangeRatesUpdater.start()
+
   }
 }

@@ -16,14 +16,16 @@ object Users extends Table[User]("Users") {
   def email = column[Option[String]]("email")
   def firstName = column[String]("firstName")
   def lastName = column[String]("lastName")
+  def fullName = column[String]("fullName")
+  def avatar = column[Option[String]]("avatar")
 
-  def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName <> (User, User.unapply _)
+  def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName ~ fullName ~ avatar <> (User, User.unapply _)
 
   def providerFK = foreignKey("TR_PROVIDER_FK", providerId, Providers)(_.id)
   def uniqueProviderInfo = index("UNIQUE_PROVIDER_INFO", 
     (providerId, providerUserId), unique = true)
 
-  def autoInc = providerId ~ providerUserId ~ email ~ firstName ~ lastName returning id
+  def autoInc = providerId ~ providerUserId ~ email ~ firstName ~ lastName ~ fullName ~ avatar returning id
 
   /**
    * Inserts a new user in the DB with its id automatically generated.
@@ -33,7 +35,7 @@ object Users extends Table[User]("Users") {
    */
   def insert(user: User)(implicit s: Session) : Long = 
     autoInc.insert(user.providerId, user.providerUserId,
-      user.email, user.firstName, user.lastName)
+      user.email, user.firstName, user.lastName, user.fullName, user.avatar)
 
   private def findByProviderInfo
     (providerInfo: Provider, providerUserId: String)
