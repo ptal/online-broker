@@ -57,22 +57,21 @@ var app = $.sammy("#main", function() {
   this.get('#/currency/graph/:currencyAcronym', function(context){
 
         $.when($.ajax("/api/historic/rates/" + context.params.currencyAcronym)).done(function(history){
-            var history = {"historic": [
-                        {"timestamp": 321564853, "rate": 150.5},
-                        {"timestamp": 321564851, "rate": 160.2},
-                      ]
-                    }
+            var data = _(history.historic).map(function(elem, index) { return {x : index + 1, y: parseFloat(elem.rate) }});
+            var max = _.max(_.pluck(data, "y"));
+            var min = _.min(_.pluck(data, "y"));
+            var linearScale = d3.scale.linear().domain([min, max]).range([0, max]);
 
             context.render("/assets/templates/graph.hb", {
                     "currency": context.params.currencyAcronym
-            }).swap().then(function() {
-                                           var graph = new Rickshaw.Graph( {
+            }).swap().then(function() {var graph = new Rickshaw.Graph( {
                                                element: document.querySelector("#chart"),
                                                width: 500,
                                                height: 200,
                                                series: [{
                                                    color: 'steelblue',
-                                                   data: _(history.historic).map(function(elem) { return {x : elem.timestamp, y: elem.rate }})
+                                                   data:  data,
+                                                   scale: linearScale
                                                }]
                                            });
                                            graph.render();

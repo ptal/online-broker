@@ -12,8 +12,8 @@
     {{#each currencies}}
     <tr>
 
-        <td>{{fullName}}</td>
-        <td>{{acronym}}</td>
+        <td><a href="#/currency/graph/{{acronym}}">{{fullName}}</a></td>
+        <td><a href="#/currency/graph/{{acronym}}">{{acronym}}</a></td>
         <td>{{exchangeRate}}</td>
     </tr>
     {{/each}}
