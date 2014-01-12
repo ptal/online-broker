@@ -18,7 +18,7 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
 
   def eventTypeFK = foreignKey("TR_GAMEEVENTS_EVENTTYPE_FK", eventType, GameEventsType)(_.id)
 
-  def * = id.? ~ creationDate ~ eventType ~ event <> (GameEvent, GameEvent.unapply _)
+  def * = id.? ~ creationDate ~ eventType ~ event <> (GameEvent.apply _, GameEvent.unapply _)
 
   def autoInc = creationDate ~ eventType ~ event returning id
 

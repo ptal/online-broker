@@ -21,7 +21,7 @@ object Accounts extends Table[Account]("Accounts") {
   def uniqueCurrencyAccountByUser = index("UNIQUE_CURRENCY_ACCOUNT_BY_USER", 
     (owner, currency), unique = true)
 
-  def * = id.? ~ owner ~ currency ~ amount <> (Account, Account.unapply _)
+  def * = id.? ~ owner ~ currency ~ amount <> (Account.apply _, Account.unapply _)
 
   def autoInc = owner ~ currency ~ amount returning id
 
@@ -35,7 +35,6 @@ object Accounts extends Table[Account]("Accounts") {
       } yield(account)
       res.list()
     }
-
   }
 
   def transfer(accountOwner: Long, transferAmount: Double, currencyAcronym: String)

@@ -19,7 +19,7 @@ object Users extends Table[User]("Users") {
   def fullName = column[String]("fullName")
   def avatar = column[Option[String]]("avatar")
 
-  def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName ~ fullName ~ avatar <> (User, User.unapply _)
+  def * = id.? ~ providerId ~ providerUserId ~ email ~ firstName ~ lastName ~ fullName ~ avatar <> (User.apply _, User.unapply _)
 
   def providerFK = foreignKey("TR_PROVIDER_FK", providerId, Providers)(_.id)
   def uniqueProviderInfo = index("UNIQUE_PROVIDER_INFO", 
@@ -37,12 +37,12 @@ object Users extends Table[User]("Users") {
     autoInc.insert(user.providerId, user.providerUserId,
       user.email, user.firstName, user.lastName, user.fullName, user.avatar)
 
-  private def findByProviderInfo
-    (providerInfo: Provider, providerUserId: String)
+  def findByProviderInfo
+    (providerId: Long, providerUserId: String)
     (implicit s: Session): \/[OnlineBrokerError, User] =
   {
     Query(Users)
-      .filter(_.providerId === providerInfo.id)
+      .filter(_.providerId === providerId)
       .filter(_.providerUserId === providerUserId)
       .firstOption match {
         case None => -\/(UserNotRegistered(providerUserId))
@@ -56,7 +56,7 @@ object Users extends Table[User]("Users") {
       Providers.findByName(userInfo.providerName) match {
         case None => -\/(InternalServerError("Providers.findByName: Incorrect provider name."))
         case Some(provider) =>
-          findByProviderInfo(provider, userInfo.providerUserId)
+          findByProviderInfo(provider.id.get, userInfo.providerUserId)
       }
     }
   }

@@ -16,7 +16,7 @@ object ExchangeRates extends Table[ExchangeRate]("ExchangeRates") {
   def currency = column[Long]("currency")
   def event = column[Long]("exchangeRatesEvent")
 
-  def * = id.? ~ rate ~ currency ~ event <> (ExchangeRate, ExchangeRate.unapply _)
+  def * = id.? ~ rate ~ currency ~ event <> (ExchangeRate.apply _, ExchangeRate.unapply _)
 
   def currencyFK = foreignKey("EXCHANGERATE_CURRENCY_FK", currency, Currencies)(_.id)
   def eventFK = foreignKey("TR_EVENT_FK", event, ExchangeRatesEvents)(_.id)

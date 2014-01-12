@@ -6,8 +6,6 @@ import scala.slick.driver.MySQLDriver.simple._
 import com.onlinebroker.models.tables._
 import com.onlinebroker.models.SQLDatabase.DBAccess
 
-
-
 case class Currency(
   id: Option[Long],
   acronym: String,

@@ -31,7 +31,11 @@ object InitDB extends App {
       ++ ExchangeRatesEvents.ddl ++ GameEvents.ddl ++ GameEventsType.ddl
       ++ Providers.ddl ++ TransferGameEvents.ddl ++ Users.ddl)
 
-    tables.drop
+    try {
+      tables.drop
+    } catch {
+      case e: Exception => Logger.info("Create tables...")
+    }
     tables.create
 
     // Initialize the event types table.

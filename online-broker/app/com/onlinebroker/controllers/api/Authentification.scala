@@ -62,24 +62,8 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
     ???
   }
 
-  // FIX: Use the table.Users table.
   def save(user: Identity): Identity = {
-    val INITIAL_MONEY = 300000
-    DBAccess.db.withSession{ implicit session : Session  =>
-      Users.findByInfo(AuthenticationUserInfo(user.identityId.providerId, user.identityId.userId)).fold(
-        error => {
-          println(user)
-          val userId = Users.insert(identityToUser(user))
-          // FIXME: Insert the first amount of money for the user
-          Currencies.findByAcronym("USD").fold(
-            error => Logger.error(s"Error $error when creating account, can't find currency USD"),
-            currency => Accounts.insert(Account(None, userId, currency.id.get, INITIAL_MONEY))
-          )
-
-        },
-        (_) => ()
-      )
-    }
+    User.createIfNew(identityToUser(user))
     user
   }
 
