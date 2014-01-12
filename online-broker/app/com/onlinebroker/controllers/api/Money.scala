@@ -32,10 +32,8 @@ object Money extends Controller with securesocial.core.SecureSocial {
   }
 
   def listCurrencies = SecuredAction {
-    //FIXME: Find the way to serialize the errors as json
-    implicit val writer = Json.writes[CurrencyInfo]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
-      error => InternalServerError(error.toString),
+      error => BadRequest(GenericError.makeErrorResponse(error)),
       rates => Ok(Json.obj(
         "status" -> "OK",
         "rates" -> JsArray(

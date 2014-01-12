@@ -63,9 +63,7 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
     for{event <- GameEvents.findLastEventByName(eventName)
         currency <- Currencies.findByAcronym(currencyAcronym)
         rate <- findLastRateByCurrency(currency.id.get, event)}
-    yield {
-      rate
-    }
+    yield rate
   }
 
   def findAllLastExchangeRates
@@ -82,6 +80,23 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
       }
     }
     result.sequenceU
+  }
+
+  def historicOfExchangeRates(currency: Long)(implicit s: Session): \/[OnlineBrokerError, List[RateHistoric]] =
+  {
+    GameEvents.findAllEventByName(eventName) match {
+      case -\/(e) => -\/(e)
+      case \/-(events) => {
+        \/-(events.map(event => {
+          val exchangeRate = 
+            Query(ExchangeRates)
+            .filter(_.event === event.event)
+            .filter(_.currency === currency)
+            .firstOption.get
+          RateHistoric(event.creationDate.getTime(), exchangeRate.rate)
+        }))
+      }
+    }
   }
 
   def eventType(implicit s: Session): \/[OnlineBrokerError, GameEventType] = {

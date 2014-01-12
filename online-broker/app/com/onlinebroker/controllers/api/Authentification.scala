@@ -9,7 +9,6 @@ import securesocial.core._
 import securesocial.core.providers.Token
 
 import com.onlinebroker.models._
-import com.onlinebroker.models.tables._
 import com.onlinebroker.models.SQLDatabase._
 import scalaz.\/
 

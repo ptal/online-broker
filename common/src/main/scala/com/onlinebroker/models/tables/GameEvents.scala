@@ -32,13 +32,25 @@ object GameEvents extends Table[GameEvent]("GameEvents") {
       eventType
     }
     res.flatMap{ gameEventType =>
-        Query(GameEvents)
-          .filter(_.eventType === gameEventType.id)
-          .sortBy(_.creationDate.desc)
-          .firstOption match {
-          case None => -\/(NotYetSuchEvent(eventName))
-          case Some(gameEvent: GameEvent) => \/-(gameEvent)
-        }
+      Query(GameEvents)
+        .filter(_.eventType === gameEventType.id)
+        .sortBy(_.creationDate.desc)
+        .firstOption match {
+        case None => -\/(NotYetSuchEvent(eventName))
+        case Some(gameEvent: GameEvent) => \/-(gameEvent)
+      }
+    }
+  }
+
+  def findAllEventByName(eventName: String)(implicit s: Session): \/[OnlineBrokerError, List[GameEvent]] = {
+    GameEventsType.findByName(eventName) match {
+      case -\/(e) => -\/(e)
+      case \/-(eventType) => {
+        val events = Query(GameEvents)
+        .filter(_.eventType === eventType.id.get)
+        .sortBy(_.creationDate.desc)
+        \/-(events.list())
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 package com.onlinebroker.models
 
-import scalaz.\/
+import scalaz.{\/, -\/, \/-}
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
@@ -12,10 +12,22 @@ case class ExchangeRatesEvent(
   base: Long
 )
 
+case class RateHistoric(timestamp: Long, rate: Double)
+
 object ExchangeRatesEvent{
   def findAllLastExchangeRates: \/[OnlineBrokerError, List[CurrencyInfo]] = {
     DBAccess.db withSession { implicit session : Session =>
       ExchangeRatesEvents.findAllLastExchangeRates
+    }
+  }
+
+  def rateHistoric(currency: String): \/[OnlineBrokerError, List[RateHistoric]] =
+  {
+    DBAccess.db withSession { implicit session : Session =>
+      Currencies.findByAcronym(currency) match {
+        case -\/(e) => -\/(e)
+        case \/-(currency) => ExchangeRatesEvents.historicOfExchangeRates(currency.id.get)
+      }
     }
   }
 }
