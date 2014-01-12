@@ -1,0 +1,89 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{url}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{xcolor}
+\usepackage{textcomp} 
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+
+\title{Courtier Forex}
+\author{Inigo \sc{Mediavilla} \and \textnormal{Pierre} \sc{Talbot}}
+
+\usetheme{Warsaw}
+
+\begin{document}
+\begin{frame}
+  \tikz [remember picture,overlay]
+  \node at
+      ([yshift=-2.5cm,xshift=-3.3cm]current page.east) 
+      %or: (current page.center)
+      {\includegraphics[scale=0.15]{pictures/scala-logo.png}};
+  \tikz [remember picture,overlay]
+  \node at
+      ([yshift=-2.5cm,xshift=3.3cm]current page.west) 
+      %or: (current page.center)
+      {\includegraphics[scale=0.08]{pictures/play-logo.png}};
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Fonctionnalités}
+
+\begin{itemize}
+\item Authentification SSO.
+\item Ouverture de compte.
+\item Transaction d'un compte à un autre.
+\item Consultation des taux du marché.
+\item Démon mettant à jour la base de donnée (API http://openexchangerates.org/)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Serveur}
+  \tikz [remember picture,overlay]
+  \node at
+      ([yshift=-2.5cm,xshift=3.3cm]current page.north) 
+      %or: (current page.center)
+      {\includegraphics[scale=0.5]{pictures/slick-logo.png}};
+
+\begin{block}{Extensible}
+Système d'événement permettant l'ajout facile de fonctionnalités. Exemple d'événements:
+  \begin{itemize}
+    \item Ouverture d'un compte.
+    \item Transfert d'argent.
+    \item Mise à jour des taux de changes.
+  \end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Securisé}
+
+\begin{block}{Authentification}
+\begin{itemize}
+\item Api SecureSocial.
+\item Connection via compte Facebook, Github, ... (SSO).
+\end{itemize}
+\end{block}
+
+\begin{block}{Design}
+\begin{itemize}
+  \item Échanges cryptés (protocole https).
+  \item Utilisation des monades pour les erreurs.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Client}
+\end{frame}
+
+\end{document}
