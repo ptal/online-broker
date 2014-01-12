@@ -41,7 +41,7 @@
 \item Ouverture de compte.
 \item Transfert de devises.
 \item Consultation des taux du marché.
-\item Démon mettant à jour la base de donnée (API http://openexchangerates.org/).
+\item Démon mettant à jour la base de données (API http://openexchangerates.org/).
 \end{itemize}
 
 \end{frame}
@@ -64,7 +64,7 @@ Système d'événement permettant l'ajout facile de fonctionnalités. Exemple d'
 \end{frame}
 
 \begin{frame}
-\frametitle{Securisé}
+\frametitle{Securité}
 
 \begin{block}{Authentification}
 \begin{itemize}
@@ -74,13 +74,25 @@ Système d'événement permettant l'ajout facile de fonctionnalités. Exemple d'
 \end{block}
 
 \begin{block}{Erreur}
-  \item Utilisation des monades pour les erreurs.
-\end{itemize}
+Utilisation des monades pour les erreurs.
 \end{block}
 \end{frame}
 
 \begin{frame}
 \frametitle{Client}
+
+\begin{block}{REST}
+Le DOM est modifié grâce aux requêtes ajax JSON effectées, pas de rechargement de pages entières.
+\end{block}
+
+\begin{block}{Technologies}
+\begin{itemize}
+\item jQuery
+\item SammyJS : Historique.
+\item Handlebars : Génération de pages templatées.
+\item WebSocket : Mise à jour automatique des taux de changes.
+\end{itemize}
+\end{block}
 \end{frame}
 
 \end{document}
