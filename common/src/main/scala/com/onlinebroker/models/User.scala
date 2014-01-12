@@ -32,7 +32,7 @@ case class AccountInfo(
 
 object User {
 
-  val INITIAL_MONEY = 300000
+  val INITIAL_MONEY = 1000.0
 
   def createIfNew(user: User): Option[OnlineBrokerError] = {
     DBAccess.db withSession { implicit session =>
