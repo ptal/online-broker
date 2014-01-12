@@ -137,7 +137,7 @@ object ExchangeRatesUpdater extends Config {
 
   def start() = {
     running(FakeApplication()) {
-        Await.result(makeJsonRequest(latestRateURL, makeExchangeRatesEvent), DurationInt(20).seconds)
+        Await.result(makeJsonRequest(latestRateURL, makeExchangeRatesEvent).flatMap(_ => WS.url("http://localhost:9000/api/db/updated/").get), DurationInt(20).seconds)
     }
   }
 }

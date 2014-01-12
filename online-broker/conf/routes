@@ -10,7 +10,7 @@ GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts
 POST  /api/account/open     com.onlinebroker.controllers.api.Player.openAccount
 GET   /api/historic/rates/:currency com.onlinebroker.controllers.api.Historic.rateHistoric(currency)
 
-GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
+GET   /        com.onlinebroker.controllers.html.MainController.userAccounts
 GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
 GET   /api/db/currenciesws  com.onlinebroker.controllers.api.Money.listCurrenciesWebSocket
 
