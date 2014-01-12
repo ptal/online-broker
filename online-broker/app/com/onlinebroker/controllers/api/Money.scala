@@ -9,6 +9,8 @@ import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.iteratee.Concurrent
 
+import scalaz.{\/, -\/, \/-}
+
 import com.onlinebroker.models._
 import com.onlinebroker.models.tables.{CurrencyInfo, ExchangeRates, Currencies}
 
@@ -47,6 +49,39 @@ object Money extends Controller with securesocial.core.SecureSocial {
     )
   }
 
+  def transfer = SecuredAction(parse.json) { request =>
+    print (request.body)
+    val id = request.user.identityId
+    implicit val transferReads = (
+      (__ \ "amount").read[Double] and
+      (__ \ "from").read[String] and
+      (__ \ "to").read[String]
+      tupled
+    )
+    request.body.validate[(Double, String, String)].fold(
+      valid = { case (amount, fromCurrencyAcronym, toCurrencyAcronym) =>
+        TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, 
+          AuthenticationUserInfo(id.providerId, id.userId)) match 
+        {
+          case -\/(error) => BadRequest(GenericError.makeErrorResponse(error))
+          case \/-(transferInfo) => Ok(Json.obj(
+            "status" -> "OK",
+            "from" -> Json.obj(
+              "currency" -> fromCurrencyAcronym,
+              "amount" -> transferInfo.from.toString()),
+            "to" -> Json.obj(
+              "currency" -> toCurrencyAcronym,
+              "amount" -> transferInfo.to.toString())
+          ))
+        }
+      },
+      invalid = { error => BadRequest(Json.toJson(Map(
+        "status" -> "KO", 
+        "error" -> s"The request is invalid. Error: ${error.toString}"
+      )))}
+    )
+  }
+
   def updateCurrencies = Action { request =>
     implicit val writer = Json.writes[CurrencyInfo]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
@@ -67,35 +102,5 @@ object Money extends Controller with securesocial.core.SecureSocial {
       println("Disconnected")
     }
     (in, out)
-  }
-
-  def transfer = Action(parse.json) { request =>
-    implicit val transferReads = (
-      (__ \ "providerName").read[String] and
-      (__ \ "userId").read[String] and
-      (__ \ "amount").read[Double] and
-      (__ \ "currencyFrom").read[String] and
-      (__ \ "currencyTo").read[String]
-      tupled
-    )
-    request.body.validate[(String, String, Double, String, String)].fold(
-      valid = { case (providerName, userID, amount, fromCurrencyAcronym, toCurrencyAcronym) =>
-        val transfer = for {
-          ratedAmount <- TransferGameEvent.transfer(fromCurrencyAcronym, toCurrencyAcronym, amount, AuthenticationUserInfo(providerName=providerName, providerUserId = userID))
-        } yield {Ok(makeTransferResponse(amount))}
-        transfer.getOrElse(
-          BadRequest(
-            Json.obj(
-              "status" -> "KO",
-              "error" -> "Error when retrieving the exchange rate for a currency"
-            )
-          )
-        )
-      },
-      invalid = { error => BadRequest(Json.toJson(Map(
-        "status" -> "KO", 
-        "error" -> s"The request is invalid. Error: ${error.toString}"
-      )))}
-    )
   }
 }
