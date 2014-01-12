@@ -41,7 +41,8 @@ object OpenAccountEvent{
     session.withTransaction {
       val res = for{
         newAccount <- Account.open(userId, toOpen.id.get, 0)
-        debitedAccount <- Accounts.transfer(userId, -openingAccountCost, paymentAccountCurrency)
+        payRate <- ExchangeRatesEvents.findLastRateByCurrencyAcronym(paymentAccountCurrency)
+        debitedAccount <- Accounts.transfer(userId, -(openingAccountCost*payRate.rate), paymentAccountCurrency)
       } yield OpenAccountInfo(debitedAccount.amount, 0)
       res match {
         case -\/(e) => {
