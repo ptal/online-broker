@@ -55,12 +55,36 @@ var app = $.sammy("#main", function() {
     transfer_currencies(context);
   })
 
+  this.post('#/openaccount/', function(context){
+    open_account(context);
+  })
+
 });
 
 $(function() {
   app.run();
   window.history.pushState({state:1}, "State 1", "#/");
 });
+
+function open_account(context) {
+  $.ajax({
+          url: "/api/account/open",
+          type: "post",
+          data: JSON.stringify({
+            "account-to-open": context.params.currencyTo,
+            "pay-with-account": context.params.currencyFrom
+          }),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          success: function (data, text) {
+            console.log(data);
+            context.redirect('#/');
+          },
+          error: function (request, status, error) {
+            console.log(request.responseText);
+          }
+      })
+}
 
 function transfer_currencies(context) {
   $.ajax({
