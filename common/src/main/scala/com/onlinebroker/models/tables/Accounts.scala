@@ -60,7 +60,6 @@ object Accounts extends Table[Account]("Accounts") {
         else
         {
           val accountId = account.id.get
-          println(accountId)
           val myAccount = for (a <- Accounts if a.id === accountId) yield a.amount
           myAccount.update(newAmount)
           \/-(Query(Accounts).filter(_.id === accountId).firstOption.get)

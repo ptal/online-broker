@@ -21,7 +21,7 @@ case class AccountAfterTransfer(
 object TransferGameEvent 
 {
   def computeRatedAmount(fromRate: Double, toRate: Double, amount: Double): Double = {
-    (1/fromRate) * amount * toRate
+    amount * (toRate/fromRate)
   }
 
   def transfer(fromCurrencyAcronym: String, toCurrencyAcronym: String, 
@@ -39,7 +39,7 @@ object TransferGameEvent
         { case (accountOwner, ratedAmount) =>
           session.withTransaction {
             val res = for{
-              fromAccount <- Accounts.transfer(accountOwner.id.get, -ratedAmount, fromCurrencyAcronym)
+              fromAccount <- Accounts.transfer(accountOwner.id.get, -amount, fromCurrencyAcronym)
               toAccount <- Accounts.transfer(accountOwner.id.get, ratedAmount, toCurrencyAcronym)}
             yield { (fromAccount, toAccount) }
             res match {

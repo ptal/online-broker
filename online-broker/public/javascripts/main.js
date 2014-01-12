@@ -96,9 +96,9 @@ function transfer_currencies(context) {
           url: "/api/transfer",
           type: "post",
           data: JSON.stringify({
+            "amount" : parseInt(context.params.amount),
             "from": context.params.currencyFrom,
             "to": context.params.currencyTo,
-            "amount" : parseInt(context.params.amount),
           }),
           dataType: "json",
           contentType: "application/json; charset=utf-8",
