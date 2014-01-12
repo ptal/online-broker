@@ -25,6 +25,11 @@ case class AuthenticationUserInfo(
   providerUserId: String
 )
 
+case class AccountInfo(
+  currencyAcronym: String,
+  amount: Double
+)
+
 object User {
 
   val INITIAL_MONEY = 300000
@@ -48,6 +53,19 @@ object User {
         case \/-(user) => Some(user)
         case -\/(_) => None
       }
+    }
+  }
+
+  def listAccounts(userInfo: AuthenticationUserInfo): List[AccountInfo] = {
+    DBAccess.db withSession { implicit session =>
+      val res = Users.findByInfo(userInfo) match {
+        case \/-(user) => {Some(
+          Accounts.findAccountsByUser(user.id.get)
+                  .map(a => AccountInfo(Currencies.findById(a.currency).acronym, a.amount)))
+        }
+        case -\/(_) => None
+      }
+      res.get
     }
   }
 }

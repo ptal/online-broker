@@ -28,13 +28,11 @@ object Accounts extends Table[Account]("Accounts") {
   def insert(account: Account)(implicit s: Session) : Long = 
     autoInc.insert(account.owner, account.currency, account.amount)
 
-  def accountsForUser(userId: Long) = {
-    DBAccess.db.withSession { implicit session : Session =>
-      val res = for {
-        account <- Accounts if account.owner === userId
-      } yield(account)
-      res.list()
-    }
+  def findAccountsByUser(userId: Long)(implicit s: Session): List[Account] = {
+    val res = for {
+      account <- Accounts if account.owner === userId
+    } yield(account)
+    res.list()
   }
 
   def transfer(accountOwner: Long, transferAmount: Double, currencyAcronym: String)

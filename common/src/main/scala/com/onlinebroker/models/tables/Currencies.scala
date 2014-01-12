@@ -33,6 +33,18 @@ object Currencies extends Table[Currency]("Currencies") {
     }
   }
 
+  def findById(id: Long)
+    (implicit s: Session): Currency =
+  {
+    val res =Query(Currencies)
+    .filter(_.id === id)
+    .firstOption match {
+      case None => None // Must be impossible or a foreign key is violated.
+      case Some(currency) => Some(currency)
+    }
+    res.get
+  }
+
   def nameOfAllCurrencies() : List[Currency] =
   {
     DBAccess.db.withSession{ implicit session =>
