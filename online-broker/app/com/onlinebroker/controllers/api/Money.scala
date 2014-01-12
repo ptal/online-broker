@@ -23,8 +23,8 @@ object Money extends Controller with securesocial.core.SecureSocial {
     val currencies = Currencies.nameOfAllCurrencies()
     Ok(Json.obj(
       "status" -> "OK",
-      "currencies" -> JsObject(
-        currencies.map(c => ("currency" -> Json.obj(
+      "currencies" -> JsArray(
+        currencies.map(c => (Json.obj(
           "acronym" -> c.acronym, 
           "fullName" -> JsString(c.name))))
         .toSeq)
@@ -38,10 +38,10 @@ object Money extends Controller with securesocial.core.SecureSocial {
       error => InternalServerError(error.toString),
       rates => Ok(Json.obj(
         "status" -> "OK",
-        "currencies" -> JsObject(
-          rates.map(c => ("currency" -> Json.obj(
-            "acronym" -> c.acronym, 
-            "rate" -> JsString(c.exchangeRate.toString()))))
+        "rates" -> JsArray(
+          rates.map(c => Json.obj(
+            "currency" -> c.acronym, 
+            "rate" -> JsString(c.exchangeRate.toString())))
           .toSeq)
       ))
     )
