@@ -5,7 +5,7 @@
 # Home page
 GET   /api/currencies       com.onlinebroker.controllers.api.Money.listCurrencies
 GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames()
-GET   /api/user/accounts    com.onlinebroker.controllers.api.UserController.listAccounts()
+GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts()
 GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 
 GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
