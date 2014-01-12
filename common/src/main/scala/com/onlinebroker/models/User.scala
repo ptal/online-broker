@@ -41,6 +41,7 @@ object User {
         case -\/(UserNotRegistered(_)) => {
           val userId = Users.insert(user)
           Account.open(userId, "USD", INITIAL_MONEY)
+          None
         }
         case -\/(e) => Some(e)
       }

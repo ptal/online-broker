@@ -32,7 +32,7 @@ case class NotYetSuchEvent(eventName: String) extends OnlineBrokerError {
 
 case class BadCurrencyAcronym(acronym: String) extends OnlineBrokerError {
   def name = "bad-currency-acronym"
-  def description = "Currency acronym " + acronym + " does not exist in our database."
+  def description = "Currency acronym " + acronym + " does not exist."
 }
 
 case class TransferWithClosedAccount() extends OnlineBrokerError {
@@ -43,4 +43,14 @@ case class TransferWithClosedAccount() extends OnlineBrokerError {
 case class NegativeAccountNotAllowed() extends OnlineBrokerError {
   def name = "negative-account-not-allowed"
   def description = "You tried to transfer money without having the money to do so."
+}
+
+case class AccountAlreadyOpened() extends OnlineBrokerError {
+  def name = "account-already-opened"
+  def description = "You tried to open an account that is already opened."
+}
+
+case class NotEnoughMoneyToOpenAccount() extends OnlineBrokerError {
+  def name = "not-enough-money-to-open-account"
+  def description = "You tried to open an account but you haven't enough money to do so."
 }

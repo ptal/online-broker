@@ -10,5 +10,6 @@ object GenericError {
   def makeErrorResponse(error: OnlineBrokerError): JsObject =
     Json.obj(
       "status" -> "KO",
-      "name" -> error.name)
+      "name" -> error.name,
+      "description" -> error.description)
 }

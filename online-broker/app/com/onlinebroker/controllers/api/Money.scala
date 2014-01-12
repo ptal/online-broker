@@ -12,19 +12,12 @@ import play.api.libs.iteratee.Concurrent
 import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
-import com.onlinebroker.models.tables.{CurrencyInfo, ExchangeRates, Currencies}
+import com.onlinebroker.models.tables._
 
 
 object Money extends Controller with securesocial.core.SecureSocial {
 
   val (out, channel) = Concurrent.broadcast[String]
-
-  def makeTransferResponse(amount: Double) = {
-    Json.obj(
-      "status" -> "OK",
-      "amount" -> Json.toJson(amount)
-    )
-  }
 
   def listCurrenciesNames = SecuredAction {
     Ok(Json.obj(
@@ -50,7 +43,6 @@ object Money extends Controller with securesocial.core.SecureSocial {
   }
 
   def transfer = SecuredAction(parse.json) { request =>
-    print (request.body)
     val id = request.user.identityId
     implicit val transferReads = (
       (__ \ "amount").read[Double] and

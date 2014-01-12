@@ -35,33 +35,48 @@ object Accounts extends Table[Account]("Accounts") {
     res.list()
   }
 
+  def findAccount(userId: Long, currency: Long)
+    (implicit s: Session): Option[Account] =
+  {
+    Query(Accounts)
+    .filter(_.owner === userId)
+    .filter(_.currency === currency)
+    .firstOption
+  }
+
+  // Pre-condition: Must be in a transaction.
+  def transfer(accountOwner: Long, transferAmount: Double, currency: Long)
+    (implicit s: Session): \/[OnlineBrokerError, Account] =
+  {
+    Query(Accounts)
+    .filter(_.owner === accountOwner)
+    .filter(_.currency === currency)
+    .firstOption match {
+      case None => -\/(TransferWithClosedAccount())
+      case Some(account) => {
+        val newAmount = account.amount + transferAmount
+        if(newAmount < 0)
+          -\/(NegativeAccountNotAllowed())
+        else
+        {
+          val accountId = account.id.get
+          println(accountId)
+          val myAccount = for (a <- Accounts if a.id === accountId) yield a.amount
+          myAccount.update(newAmount)
+          \/-(Query(Accounts).filter(_.id === accountId).firstOption.get)
+        }
+      }
+    }
+  }
+
+  // Pre-condition: Must be in a transaction.
   def transfer(accountOwner: Long, transferAmount: Double, currencyAcronym: String)
     (implicit s: Session): \/[OnlineBrokerError, Account] =
   {
     // One request to retrieve the account should be enough.
     Currencies.findByAcronym(currencyAcronym) match {
       case -\/(error) => -\/(error)
-      case \/-(currency:Currency) => {
-        Query(Accounts)
-        .filter(_.owner === accountOwner)
-        .filter(_.currency === currency.id.get)
-        .firstOption match {
-          case None => -\/(TransferWithClosedAccount())
-          case Some(account) => {
-            val newAmount = account.amount + transferAmount
-            if(newAmount < 0)
-              -\/(NegativeAccountNotAllowed())
-            else
-            {
-              val accountId = account.id.get
-              println(accountId)
-              val myAccount = for (a <- Accounts if a.id === accountId) yield a.amount
-              myAccount.update(newAmount)
-              \/-(Query(Accounts).filter(_.id === accountId).firstOption.get)
-            }
-          }
-        }
-      }
+      case \/-(currency) => transfer(accountOwner, transferAmount, currency.id.get)(s)
     }
   }
 }

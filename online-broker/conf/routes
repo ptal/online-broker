@@ -4,14 +4,15 @@
 
 # Home page
 GET   /api/currencies       com.onlinebroker.controllers.api.Money.listCurrencies
-GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames()
-GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts()
+GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames
+POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer
+GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts
+POST  /user/account/open    com.onlinebroker.controllers.html.Player.openAccount
 GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 
 GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
 GET   /api/db/currenciesws  com.onlinebroker.controllers.api.Money.listCurrenciesWebSocket
 
-POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file       controllers.Assets.at(path="/public", file)

@@ -25,7 +25,8 @@ object TransferGameEvent
   }
 
   def transfer(fromCurrencyAcronym: String, toCurrencyAcronym: String, 
-    amount: Double, userInfo: AuthenticationUserInfo): \/[OnlineBrokerError, AccountAfterTransfer] = {
+    amount: Double, userInfo: AuthenticationUserInfo): \/[OnlineBrokerError, AccountAfterTransfer] =
+  {
     DBAccess.db withSession { implicit session =>
       // We retrieve twice the currency, should be improved.
       val res = for{

@@ -17,15 +17,21 @@ case class Account(
 )
 
 object Account {
+  def open(userId: Long, currency: Long, initialAmount: Double)
+    (implicit s: Session): \/[OnlineBrokerError, Long] =
+  {
+    Accounts.findAccount(userId, currency) match {
+      case Some(_) => -\/(AccountAlreadyOpened())
+      case None => \/-(Accounts.insert(Account(None, userId, currency, initialAmount)))
+    }
+  }
+
   def open(userId: Long, currencyAcronym: String, initialAmount: Double)
-    (implicit s: Session): Option[OnlineBrokerError] =
+    (implicit s: Session): \/[OnlineBrokerError, Long] =
   {
     Currencies.findByAcronym(currencyAcronym) match {
-      case -\/(e) => Some(e)
-      case \/-(currency) => {
-        Accounts.insert(Account(None, userId, currency.id.get, initialAmount))
-        None
-      }
+      case -\/(e) => -\/(e)
+      case \/-(currency) => open(userId, currency.id.get, initialAmount)
     }
   }
 }
