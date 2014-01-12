@@ -8,8 +8,8 @@ GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrencie
 POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer
 GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts
 POST  /api/account/open     com.onlinebroker.controllers.api.Player.openAccount
-GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 
+GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
 GET   /api/db/currenciesws  com.onlinebroker.controllers.api.Money.listCurrenciesWebSocket
 
@@ -20,7 +20,6 @@ GET     /assets/*file       controllers.Assets.at(path="/public", file)
 
 # Login page
 GET     /login                     securesocial.controllers.LoginPage.login
-#GET     /login                      controllers.html.MainController.login
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
 # User Registration and password handling
