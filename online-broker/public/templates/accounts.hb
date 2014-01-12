@@ -25,7 +25,8 @@
 <form method="POST" action="#/transfer/" class="pure-form pure-form-aligned">
 <fieldset>
     <legend>Transfer</legend>
-
+    <div class="alert alert-danger" id="errorTransfer" style="display:none">
+    </div>
     <div class="pure-control-group">
         <label for="currencyFrom"> From Currency </label>
 
@@ -57,7 +58,8 @@
 <form method="POST" action="#/openaccount/" class="pure-form pure-form-aligned">
 <fieldset>
     <legend>Open Account</legend>
-
+    <div class="alert alert-danger" id="errorOpenAccount" style="display:none">
+    </div>
     <div class="pure-control-group">
         <label for="currencyFrom"> From Currency </label>
 

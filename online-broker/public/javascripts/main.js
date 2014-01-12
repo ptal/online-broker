@@ -85,6 +85,8 @@ function open_account(context) {
           },
           error: function (request, status, error) {
             console.log(request.responseText);
+            $("#errorOpenAccount").text(JSON.parse(request.responseText).description);
+            $("#errorOpenAccount").css("display", "block");
           }
       })
 }
@@ -106,6 +108,8 @@ function transfer_currencies(context) {
           },
           error: function (request, status, error) {
             console.log(request.responseText);
+            $("#errorTransfer").text(JSON.parse(request.responseText).description);
+            $("#errorTransfer").css("display", "block");
           }
       })
 }
