@@ -25,10 +25,12 @@ object Money extends Controller with securesocial.core.SecureSocial {
   }
 
   def listCurrenciesNames = SecuredAction {
-    Ok(Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
-      case (jarray, Currency(_, acronym, name)) =>
-        jarray :+ new JsObject(List((acronym, new JsString(name))))
-    })
+    Ok(Json.obj(
+      "status" -> "OK",
+      "rates" -> Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
+        case (jarray, Currency(_, acronym, name)) =>
+          jarray :+ new JsObject(List((acronym, new JsString(name))))
+      }))
   }
 
   def listCurrencies = SecuredAction {

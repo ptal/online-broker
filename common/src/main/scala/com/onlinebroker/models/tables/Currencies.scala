@@ -39,7 +39,6 @@ object Currencies extends Table[Currency]("Currencies") {
       val q = for { currency <- Currencies } yield { currency }
       q.list()
     }
-
   }
 
 }
