@@ -14,9 +14,11 @@ object Player extends Controller with securesocial.core.SecureSocial {
     val id = request.user.identityId
     Ok(Json.obj(
         "status" -> "OK",
-        "accounts" -> JsObject(
+        "accounts" -> JsArray(
           User.listAccounts(AuthenticationUserInfo(id.providerId, id.userId))
-              .map(c => (c.currencyAcronym, JsString(c.amount.toString())))
+              .map(c => Json.obj(
+                "currency" -> c.currencyAcronym, 
+                "amount" -> JsString(c.amount.toString())))
               .toSeq)
       ))
   }

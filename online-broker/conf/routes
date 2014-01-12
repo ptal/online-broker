@@ -7,7 +7,7 @@ GET   /api/currencies       com.onlinebroker.controllers.api.Money.listCurrencie
 GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames
 POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer
 GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts
-POST  /user/account/open    com.onlinebroker.controllers.api.Player.openAccount
+POST  /api/account/open     com.onlinebroker.controllers.api.Player.openAccount
 GET   /user/accounts        com.onlinebroker.controllers.html.MainController.userAccounts
 
 GET   /api/db/updated/      com.onlinebroker.controllers.api.Money.updateCurrencies
