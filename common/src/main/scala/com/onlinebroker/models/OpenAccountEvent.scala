@@ -39,10 +39,17 @@ object OpenAccountEvent{
     (implicit session: Session): \/[OnlineBrokerError, OpenAccountInfo] =
   {
     session.withTransaction {
-      for{
+      val res = for{
         newAccount <- Account.open(userId, toOpen.id.get, 0)
         debitedAccount <- Accounts.transfer(userId, -openingAccountCost, paymentAccountCurrency)
       } yield OpenAccountInfo(debitedAccount.amount, 0)
+      res match {
+        case -\/(e) => {
+          session.rollback
+          -\/(e)
+        }
+        case \/-(r) => \/-(r)
+      }
     }
   }
 }
