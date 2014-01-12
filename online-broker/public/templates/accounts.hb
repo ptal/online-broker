@@ -49,7 +49,7 @@
         <input type="text" name="amount"/>
     </div>
     <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+        <button type="submit" class="pure-button pure-button-primary">Transfer</button>
     </div>
 
 </fieldset>
@@ -78,7 +78,8 @@
         </select>
     </div>
     <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+        <p class="help-block">Opening an account costs 100 Dollars</p>
+        <button type="submit" class="pure-button pure-button-primary">Open Account</button>
     </div>
 
 </fieldset>

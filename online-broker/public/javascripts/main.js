@@ -41,18 +41,45 @@ var app = $.sammy("#main", function() {
   this.get('#/currencies/', function(context) {
 
       connection.onmessage = function (e) {
-        context.render("/assets/templates/currencies.hb", {
-          "currencies": JSON.parse(e.data)
-        }).swap();
+        updateCurrencies();
       };
 
-      $.when($.ajax("/api/currencies"),$.ajax("/api/currencies/names")).done(function(currencies, currencyNames){
-        context.render("/assets/templates/currencies.hb", {
-          "currencies": mergeCurrencies(currencies[0].rates, currencyNames[0].currencies)
-        }).swap();
-      });
-
+      function updateCurrencies() {
+        $.when($.ajax("/api/currencies"),$.ajax("/api/currencies/names")).done(function(currencies, currencyNames){
+          context.render("/assets/templates/currencies.hb", {
+            "currencies": mergeCurrencies(currencies[0].rates, currencyNames[0].currencies)
+          }).swap();
+        });
+      }
+      updateCurrencies();
     });
+
+  this.get('#/currency/graph/:currencyAcronym', function(context){
+
+        $.when($.ajax("/api/historic/rates/" + context.params.currencyAcronym)).done(function(history){
+            var history = {"historic": [
+                        {"timestamp": 321564853, "rate": 150.5},
+                        {"timestamp": 321564851, "rate": 160.2},
+                      ]
+                    }
+
+            context.render("/assets/templates/graph.hb", {
+                    "currency": context.params.currencyAcronym
+            }).swap().then(function() {
+                                           var graph = new Rickshaw.Graph( {
+                                               element: document.querySelector("#chart"),
+                                               width: 500,
+                                               height: 200,
+                                               series: [{
+                                                   color: 'steelblue',
+                                                   data: _(history.historic).map(function(elem) { return {x : elem.timestamp, y: elem.rate }})
+                                               }]
+                                           });
+                                           graph.render();
+                                       });
+
+        });
+  })
 
   this.post('#/transfer/', function(context){
     transfer_currencies(context);
