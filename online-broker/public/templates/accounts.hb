@@ -10,9 +10,10 @@
         </tr>
     </thead>
     <tbody>
+
         {{#each userInfo.accounts}}
         <tr>
-            <td>{{fullCurrency.name}}</td>
+            <td>{{fullCurrency.fullName}}</td>
             <td>{{fullCurrency.acronym}}</td>
             <td>{{account.amount}}</td>
         </tr>
@@ -30,7 +31,7 @@
 
         <select name="currencyFrom" id="currency-from-choice">
         {{#each userInfo.accounts}}
-          <option value="{{fullCurrency.acronym}}">{{fullCurrency.name}}({{fullCurrency.exchangeRate}})</option>
+          <option value="{{fullCurrency.acronym}}">{{fullCurrency.fullName}}({{exchangeRate}})</option>
         {{/each}}
         </select>
     </div>
@@ -38,7 +39,7 @@
         <label for="currencyTo"> To Currency </label>
         <select name="currencyTo" id="currency-to-choice">
           {{#each currencies}}
-            <option value="{{acronym}}">{{name}}({{exchangeRate}})</option>
+            <option value="{{acronym}}">{{fullName}}({{exchangeRate}})</option>
           {{/each}}
         </select>
     </div>
