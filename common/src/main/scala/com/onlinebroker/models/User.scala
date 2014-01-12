@@ -29,8 +29,7 @@ object User {
 
   val INITIAL_MONEY = 300000
 
-  def createIfNew(user: User): Option[OnlineBrokerError] = 
-  {
+  def createIfNew(user: User): Option[OnlineBrokerError] = {
     DBAccess.db withSession { implicit session =>
       Users.findByProviderInfo(user.providerId, user.providerUserId) match {
         case \/-(_) => None
@@ -39,6 +38,15 @@ object User {
           Account.open(userId, "USD", INITIAL_MONEY)
         }
         case -\/(e) => Some(e)
+      }
+    }
+  }
+
+  def findByInfo(userInfo: AuthenticationUserInfo): Option[User] = {
+    DBAccess.db withSession { implicit session =>
+      Users.findByInfo(userInfo) match {
+        case \/-(user) => Some(user)
+        case -\/(_) => None
       }
     }
   }

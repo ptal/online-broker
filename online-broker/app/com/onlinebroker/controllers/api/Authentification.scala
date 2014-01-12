@@ -3,19 +3,14 @@ package com.onlinebroker.controllers.api
 import scala.util._
 
 import play.api.mvc._
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import play.api.{Logger, Application}
-
-import slick.driver.H2Driver.simple.Session
 
 import securesocial.core._
 import securesocial.core.providers.Token
-import securesocial.core.IdentityId
 
 import com.onlinebroker.models._
 import com.onlinebroker.models.tables._
-import com.onlinebroker.models.SQLDatabase.DBAccess
+import com.onlinebroker.models.SQLDatabase._
 import scalaz.\/
 
 
@@ -48,14 +43,11 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
 
   private var tokens = Map[String, Token]()
 
-  // FIXME: Use the table.Users table.
   def find(id: IdentityId): Option[Identity] = {
-    DBAccess.db.withSession { implicit session =>
-      Users.findByInfo(AuthenticationUserInfo(id.providerId, id.userId)).map{ user =>
-        SecureSocialUser(user)
-      }.toOption
+    User.findByInfo(AuthenticationUserInfo(id.providerId, id.userId)) match {
+      case Some(user) => Some(SecureSocialUser(user))
+      case None => None
     }
-
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
