@@ -13,15 +13,18 @@
     {{#each currencies}}
     <tr>
 
-        <td>{{name}}</td>
-        <td>{{acronym}}</td>
-        <td>{{exchangeRate}}</td>
-        {{#exchangeIncrease}}
+        <td>{{newC.name}}</td>
+        <td>{{newC.acronym}}</td>
+        <td>{{newC.exchangeRate}}</td>
+        {{#increase}}
             <td><span class="glyphicon glyphicon-arrow-up" style="color: green;"> </span><td>
-        {{/exchangeIncrease}}
-        {{^exchangeIncrease}}
+        {{/increase}}
+        {{#decrease}}
             <td><span class="glyphicon glyphicon-arrow-down" style="color: red;"> </span><td>
-        {{/exchangeIncrease}}
+        {{/decrease}}
+        {{#equal}}
+                    <td><td>
+        {{/equal}}
     </tr>
     {{/each}}
   </tbody>

@@ -11,10 +11,9 @@ var app = $.sammy("#main", function() {
 
   this.get('#/', function(context) {
     // fetch handlebars-partial first
-    $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies"), $.ajax("/api/currencies/minusone")).done(function(userInfoText, currenciesText, currenciesMinusOne){
+    $.when($.ajax("/api/user/" + userId), $.ajax("/api/currencies")).done(function(userInfoText, currenciesText, currenciesMinusOne){
       var userInfo = userInfoText[0];
       var currencies = currenciesText[0];
-      var currenciesMinusOne = currenciesMinusOne[0];
       context.render("/assets/templates/accounts.hb", {
         "currencies": currencies.currencies,
         "userInfo": userInfo
@@ -24,15 +23,26 @@ var app = $.sammy("#main", function() {
 
   this.get('#/currencies/', function(context) {
 
+      function mergeCurrencies(currencies, currenciesMinusOne) {
+        var allCurrencies = _(currencies).map(function(currency){
+           var old = _(currenciesMinusOne).findWhere({ acronym : currency.acronym });
+           var increase = currency.exchangeRate > old.exchangeRate;
+           var decrease = currency.exchangeRate < old.exchangeRate;
+           var equal = currency.exchangeRate == old.exchangeRate;
+           return {old: old, newC: currency, increase : increase, decrease : decrease, equal : equal}
+        });
+        return allCurrencies;
+      }
       connection.onmessage = function (e) {
         context.render("/assets/templates/currencies.hb", {
           "currencies": JSON.parse(e.data)
         }).swap();
       };
 
-      $.when($.ajax("/api/currencies")).done(function(currenciesText){
+
+      $.when($.ajax("/api/currencies"), $.ajax("/api/currencies/minusone")).done(function(currencies, currenciesMinusOne){
         context.render("/assets/templates/currencies.hb", {
-          "currencies": currenciesText.currencies
+          "currencies": mergeCurrencies(currencies[0].currencies, currenciesMinusOne[0].currencies)
         }).swap();
       });
 
