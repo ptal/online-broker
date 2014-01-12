@@ -20,12 +20,15 @@ object Money extends Controller with securesocial.core.SecureSocial {
   val (out, channel) = Concurrent.broadcast[String]
 
   def listCurrenciesNames = SecuredAction {
+    val currencies = Currencies.nameOfAllCurrencies()
     Ok(Json.obj(
       "status" -> "OK",
-      "rates" -> Currencies.nameOfAllCurrencies().foldLeft(new JsArray){
-        case (jarray, Currency(_, acronym, name)) =>
-          jarray :+ new JsObject(List((acronym, new JsString(name))))
-      }))
+      "currencies" -> JsObject(
+        currencies.map(c => ("currency" -> Json.obj(
+          "acronym" -> c.acronym, 
+          "fullName" -> JsString(c.name))))
+        .toSeq)
+    ))
   }
 
   def listCurrencies = SecuredAction {
@@ -38,7 +41,7 @@ object Money extends Controller with securesocial.core.SecureSocial {
         "currencies" -> JsObject(
           rates.map(c => ("currency" -> Json.obj(
             "acronym" -> c.acronym, 
-            "fullName" -> JsString(c.exchangeRate.toString()))))
+            "rate" -> JsString(c.exchangeRate.toString()))))
           .toSeq)
       ))
     )
