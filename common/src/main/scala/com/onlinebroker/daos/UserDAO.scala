@@ -39,7 +39,14 @@ object UserDAO {
   }
 
   def findByIdWithAggView(userId: String): Option[UserAggregatedView] = {
-    findByGithubUserId(userId).map{ (user: User) => UserAggregatedView.create(user, AccountDAO.findAccountByOwner(user.id).toSet) }
+
+    findByGithubUserId(userId).map{ (user: User) =>
+      val accounts = AccountDAO.findAccountByOwner(user.id).toSet
+      val totalAmountInDollars = accounts.foldLeft[Double](0.0){ (accumulated, account) =>
+        accumulated + (account.amount * account.currencyExchangeRate)
+      }
+      UserAggregatedView.create(user, accounts, totalAmountInDollars)
+    }
   }
 
 

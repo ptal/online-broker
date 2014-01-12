@@ -18,6 +18,12 @@
         </tr>
         {{/each}}
     </tbody>
+    <tfoot>
+          <tr>
+                <th colspan="2">Total in Dollars</th>
+                <th>{{userInfo.totalAmountInDollars}}</th>
+            </tr>
+      </tfoot>
 
 </table>
 

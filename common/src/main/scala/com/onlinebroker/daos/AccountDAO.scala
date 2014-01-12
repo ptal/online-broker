@@ -28,7 +28,7 @@ object Transfer extends Table[(Long, Long, Double, Long)]("Transfers") {
 object AccountDAO {
 
   def computeRatedAmount(fromRate: Double, toRate: Double, amount: Double): Double = {
-    (1/fromRate) * amount * toRate
+    amount * fromRate/toRate
   }
 
   def transfer(fromCurrency: String, toCurrency: String, amount: Double, owner: String) : Option[Double] = {

@@ -4,6 +4,9 @@ import play.api.Logger
 
 import scala.slick.session.Database
 import scala.slick.driver.MySQLDriver.simple._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+
 // Use the implicit threadLocalSession
 import Database.threadLocalSession
 
@@ -20,16 +23,10 @@ object InitDB extends App {
   // Creation of the tables
   DBAccess.db withSession {
     val ddl = (Transfer.ddl ++ Currencies.ddl ++ DBUpdate.ddl ++ ExchangeRates.ddl ++ UserTable.ddl)
-    //ddl.drop
+    ddl.drop
     ddl.create
 
-    //Query(ExchangeRates).delete
-    //Query(Currencies).delete
-    //Query(DBUpdate).delete
-    //Query(UserTable).delete
-    //Query(Transfer).delete
-
-    CurrenciesInitializer.init()
+    Await.result(CurrenciesInitializer.init(), DurationInt(15).seconds)
     ExchangeRatesUpdater.start()
   }
 
