@@ -36,8 +36,10 @@ object Money extends Controller with securesocial.core.SecureSocial {
       rates => Ok(Json.obj(
         "status" -> "OK",
         "currencies" -> JsObject(
-          rates.map(c => (c.acronym, JsString(c.exchangeRate.toString())))
-               .toSeq)
+          rates.map(c => ("currency" -> Json.obj(
+            "acronym" -> c.acronym, 
+            "fullName" -> JsString(c.exchangeRate.toString()))))
+          .toSeq)
       ))
     )
   }
