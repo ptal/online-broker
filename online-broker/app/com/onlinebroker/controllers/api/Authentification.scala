@@ -12,8 +12,22 @@ import com.onlinebroker.models._
 import com.onlinebroker.models.SQLDatabase._
 import scalaz.\/
 
+object AuthentificationUtils {
+  def identityToUser(id: Identity) : User = User(
+    id = None,
+    providerUserId = id.identityId.userId,
+    providerId = Provider.findIdByName(id.identityId.providerId).get,
+    email = id.email,
+    firstName = id.firstName,
+    fullName = id.fullName,
+    lastName = id.lastName,
+    avatar = id.avatarUrl
+  )
+}
 
 class MySQLUserService(application: Application) extends UserServicePlugin(application) {
+
+  import AuthentificationUtils.identityToUser
 
   case class SecureSocialUser(user: User) extends Identity{
     def identityId : securesocial.core.IdentityId = IdentityId(userId = user.providerUserId, 
@@ -28,17 +42,6 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
     def oAuth2Info = None
     def passwordInfo = None
   }
-
-  def identityToUser(id: Identity) : User = User(
-    id = None,
-    providerUserId = id.identityId.userId,
-    providerId = Provider.findIdByName(id.identityId.providerId).get,
-    email = id.email,
-    firstName = id.firstName,
-    fullName = id.fullName,
-    lastName = id.lastName,
-    avatar = id.avatarUrl
-  )
 
   private var tokens = Map[String, Token]()
 

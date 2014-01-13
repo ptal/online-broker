@@ -16,13 +16,6 @@ var app = $.sammy("#main", function() {
      });
   }
   this.get('#/', function(context) {
-    /*userInfo :
-            accounts :
-                fullCurrency:
-                    name
-                    acronym
-                account :
-                    amount */
     $.when($.ajax("/api/user/accounts"), $.ajax("/api/currencies"), $.ajax("/api/currencies/names")).done(function(userInfo, currencies, currencyNames){
       var accounts = _(userInfo[0].accounts).map( function (account) {
         var currencyInfo = _(currencyNames[0].currencies).findWhere({ acronym : account.currency });
@@ -56,26 +49,38 @@ var app = $.sammy("#main", function() {
 
   this.get('#/currency/graph/:currencyAcronym', function(context){
 
-        $.when($.ajax("/api/historic/rates/" + context.params.currencyAcronym)).done(function(history){
-            var data = _(history.historic).map(function(elem, index) { return {x : index + 1, y: parseFloat(elem.rate) }});
+        function renderGraph(data) {
             var max = _.max(_.pluck(data, "y"));
             var min = _.min(_.pluck(data, "y"));
             var linearScale = d3.scale.linear().domain([min, max]).range([0, max]);
+            var graph = new Rickshaw.Graph( {
+                element: document.querySelector("#chart"),
+                //renderer : 'line',
+                width: 500,
+                height: 200,
+                series: [{
+                    color: 'steelblue',
+                    data:  data,
+                    scale: linearScale
+                }]
+            });
+            new Rickshaw.Graph.Axis.Y.Scaled( {
+              graph: graph,
+              orientation: 'left',
+              tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+              element: document.getElementById('y_axis'),
+              scale: linearScale,
+              grid: true
+            } );
 
+            graph.render();
+        }
+
+        $.when($.ajax("/api/historic/rates/" + context.params.currencyAcronym)).done(function(history){
+            var data = _(history.historic).map(function(elem, index) { return {x : index + 1, y: parseFloat(elem.rate) }});
             context.render("/assets/templates/graph.hb", {
                     "currency": context.params.currencyAcronym
-            }).swap().then(function() {var graph = new Rickshaw.Graph( {
-                                               element: document.querySelector("#chart"),
-                                               width: 500,
-                                               height: 200,
-                                               series: [{
-                                                   color: 'steelblue',
-                                                   data:  data,
-                                                   scale: linearScale
-                                               }]
-                                           });
-                                           graph.render();
-                                       });
+            }).swap().then(function() { renderGraph(data) });
 
         });
   })

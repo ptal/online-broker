@@ -23,6 +23,18 @@ object Player extends Controller with securesocial.core.SecureSocial {
       ))
   }
 
+  def userInfo() = SecuredAction { request =>
+    val id = request.user.identityId
+    implicit val writer = Json.writes[User]
+    val user = AuthentificationUtils.identityToUser(request.user)
+    Ok(Json.obj(
+      "status" -> "OK",
+      "userInfo" -> Json.toJson(user)
+    ))
+  }
+
+
+
   def openAccount() = SecuredAction(parse.json) { request =>
     val id = request.user.identityId
     implicit val openAccountReads = (
