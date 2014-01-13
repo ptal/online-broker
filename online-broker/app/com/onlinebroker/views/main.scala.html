@@ -1,4 +1,4 @@
-@(providerUserId: String, providerName: String)
+@(userInfo: String)
 
 <!DOCTYPE html>
 
@@ -12,18 +12,11 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/rickshaw.css")">
 
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/d3.v3.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/rickshaw.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/underscore.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/jquery.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/handlebars-v1.1.2.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/sammy.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/sammy.handlebars.js")" type="text/javascript"></script>
         <script type="text/javascript">
-            var userId = "@providerUserId";
-            var providerName = "@providerName";
+            var profile = JSON.parse('@Html(userInfo)');
         </script>
-        <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
+        @helper.requireJs(core = routes.Assets.at("javascripts/require.js").url, module = routes.Assets.at("javascripts/main").url)
+
     </head>
     <body class="pure-g yui3-normalized">
             <div id="headerMenu" class="pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
