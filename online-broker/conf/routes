@@ -7,6 +7,7 @@ GET   /api/currencies       com.onlinebroker.controllers.api.Money.listCurrencie
 GET   /api/currencies/names com.onlinebroker.controllers.api.Money.listCurrenciesNames
 POST  /api/transfer         com.onlinebroker.controllers.api.Money.transfer
 GET   /api/user/accounts    com.onlinebroker.controllers.api.Player.listAccounts
+GET   /api/user/profile    com.onlinebroker.controllers.api.Player.userInfo
 POST  /api/account/open     com.onlinebroker.controllers.api.Player.openAccount
 GET   /api/historic/rates/:currency com.onlinebroker.controllers.api.Historic.rateHistoric(currency)
 

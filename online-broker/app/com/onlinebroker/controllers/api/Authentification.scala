@@ -34,9 +34,9 @@ class MySQLUserService(application: Application) extends UserServicePlugin(appli
        providerId = Provider.findNameById(user.providerId).get)
     def firstName  = user.firstName
     def lastName = user.lastName
-    def fullName = s"$firstName $lastName"
+    def fullName = user.fullName
     def email = user.email
-    def avatarUrl = None
+    def avatarUrl = user.avatar
     def authMethod = securesocial.core.AuthenticationMethod.OAuth2
     def oAuth1Info = None
     def oAuth2Info = None

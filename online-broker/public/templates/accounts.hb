@@ -1,26 +1,37 @@
 
-<h2 class="content-subhead">My Accounts</h2>
+<h2 class="content-subhead"> Accounts</h2>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Currency Name</th>
-            <th>Currency Acronym</th>
-            <th>Amount</th>
-        </tr>
-    </thead>
-    <tbody>
 
-        {{#each userInfo.accounts}}
-        <tr>
-            <td>{{fullCurrency.fullName}}</td>
-            <td>{{fullCurrency.acronym}}</td>
-            <td>{{account.amount}}</td>
-        </tr>
-        {{/each}}
-    </tbody>
+<div class="pure-g">
+        <div id="chart" class="pure-u-3-5">
+           <table class="table table-striped">
+               <thead>
+                   <tr>
+                       <th>Currency Name</th>
+                       <th>Currency Acronym</th>
+                       <th>Amount</th>
+                   </tr>
+               </thead>
+               <tbody>
 
-</table>
+                   {{#each userInfo.accounts}}
+                   <tr>
+                       <td>{{fullCurrency.fullName}}</td>
+                       <td>{{fullCurrency.acronym}}</td>
+                       <td>{{account.amount}}</td>
+                   </tr>
+                   {{/each}}
+               </tbody>
+
+           </table>
+        </div>
+        <div id="y_axis" class="pure-u-1-5"></div>
+        <div id="y_axis" class="pure-u-1-5" style="text-align:center">
+            <img data-src="holder.js/100x80" alt="Avatar" src="{{avatar}}" style="width:140px;height:140px">
+            <p><b>{{userProfile.fullName}}</b></p>
+        </div>
+
+</div>
 
 <form method="POST" action="#/transfer/" class="pure-form pure-form-aligned">
 <fieldset>

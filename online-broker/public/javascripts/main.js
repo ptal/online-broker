@@ -16,7 +16,7 @@ var app = $.sammy("#main", function() {
      });
   }
   this.get('#/', function(context) {
-    $.when($.ajax("/api/user/accounts"), $.ajax("/api/currencies"), $.ajax("/api/currencies/names")).done(function(userInfo, currencies, currencyNames){
+    $.when($.ajax("/api/user/accounts"), $.ajax("/api/currencies"), $.ajax("/api/currencies/names"), $.ajax("/api/user/profile")).done(function(userInfo, currencies, currencyNames, profile){
       var accounts = _(userInfo[0].accounts).map( function (account) {
         var currencyInfo = _(currencyNames[0].currencies).findWhere({ acronym : account.currency });
         var currencyRate = _(currencies[0].rates).findWhere({ currency : account.currency });
@@ -27,6 +27,8 @@ var app = $.sammy("#main", function() {
       context.render("/assets/templates/accounts.hb", {
         "currencies": mergeCurrencies(currencies[0].rates, currencyNames[0].currencies),
         "userInfo": { accounts : accounts},
+        "userProfile" : profile[0].user,
+        "avatar" : profile[0].avatar
       }).swap();
     });
   });

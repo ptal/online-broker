@@ -7,6 +7,7 @@ import play.api.libs.functional.syntax._
 import scalaz.{\/, -\/, \/-}
 
 import com.onlinebroker.models._
+import controllers.Assets
 
 object Player extends Controller with securesocial.core.SecureSocial {
 
@@ -24,12 +25,12 @@ object Player extends Controller with securesocial.core.SecureSocial {
   }
 
   def userInfo() = SecuredAction { request =>
-    val id = request.user.identityId
     implicit val writer = Json.writes[User]
     val user = AuthentificationUtils.identityToUser(request.user)
     Ok(Json.obj(
       "status" -> "OK",
-      "userInfo" -> Json.toJson(user)
+      "user" -> Json.toJson(user),
+      "avatar" -> Json.toJson(user.avatar.getOrElse("/assets/images/gravatar-140.png"))
     ))
   }
 
