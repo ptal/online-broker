@@ -15,7 +15,7 @@ case class ExchangeRatesEvent(
 case class RateHistoric(timestamp: Long, rate: Double)
 
 object ExchangeRatesEvent{
-  def findAllLastExchangeRates: \/[OnlineBrokerError, List[CurrencyInfo]] = {
+  def findAllLastExchangeRates: \/[OnlineBrokerError, List[CurrencyRate]] = {
     DBAccess.db withSession { implicit session : Session =>
       ExchangeRatesEvents.findAllLastExchangeRates
     }

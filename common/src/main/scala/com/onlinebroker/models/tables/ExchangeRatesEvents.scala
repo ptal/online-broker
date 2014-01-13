@@ -10,7 +10,7 @@ import scalaz.syntax.traverse._
 
 import com.onlinebroker.models._
 
-case class CurrencyInfo(id: Long, acronym: String, name: String, exchangeRate: Double)
+case class CurrencyRate(currency: String, rate: Double)
 
 object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvents") {
 
@@ -67,19 +67,27 @@ object ExchangeRatesEvents extends Table[ExchangeRatesEvent]("ExchangeRatesEvent
   }
 
   def findAllLastExchangeRates
-    (implicit s: Session): \/[OnlineBrokerError, List[CurrencyInfo]] =
+    (implicit s: Session): \/[OnlineBrokerError, List[CurrencyRate]] =
   {
-    val lastEvent = GameEvents.findLastEventByName(eventName)
-    val currencies = for {
-      currency <- Currencies
-    } yield { (currency.id, currency.acronym, currency.fullName) }
-    val result = currencies.list().map{ case (currencyId, currencyAcronym, currencyFullName) =>
+    val lastEvent = GameEvents.findLastEventByName(eventName).map(_.event)
+
+    lastEvent.fold (
+      error => -\/(error),
+      { lastEventId =>
+        val currencies = for {
+          currency <- Currencies
+          exchange <- ExchangeRates if exchange.currency === currency.id && exchange.event === lastEventId
+        } yield { (currency.acronym, exchange.rate) }
+        \/-(currencies.list().map{ case (acronym, rate) => CurrencyRate(acronym, rate)})
+      }
+    )
+    /*val result = currencies.list().map{ case (currencyId, currencyAcronym, currencyFullName) =>
       lastEvent.flatMap{ event => findLastRateByCurrency(currencyId, event).map{ e =>
-          CurrencyInfo(currencyId, currencyAcronym, currencyFullName, exchangeRate = e.rate)
+          CurrencyInfo(currencyId, exchangeRate = e.rate)
         }
       }
     }
-    result.sequenceU
+    result.sequenceU*/
   }
 
   def historicOfExchangeRates(currency: Long)(implicit s: Session): \/[OnlineBrokerError, List[RateHistoric]] =

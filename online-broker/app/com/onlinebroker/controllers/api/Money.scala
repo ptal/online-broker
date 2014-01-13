@@ -38,8 +38,8 @@ object Money extends Controller with securesocial.core.SecureSocial {
         "status" -> "OK",
         "rates" -> JsArray(
           rates.map(c => Json.obj(
-            "currency" -> c.acronym, 
-            "rate" -> JsString(c.exchangeRate.toString())))
+            "currency" -> c.currency,
+            "rate" -> JsString(c.rate.toString())))
           .toSeq)
       ))
     )
@@ -78,7 +78,7 @@ object Money extends Controller with securesocial.core.SecureSocial {
   }
 
   def updateCurrencies = Action { request =>
-    implicit val writer = Json.writes[CurrencyInfo]
+    implicit val writer = Json.writes[CurrencyRate]
     ExchangeRatesEvent.findAllLastExchangeRates.fold(
       error => play.api.mvc.Results.InternalServerError(error.toString),
       rates => {
